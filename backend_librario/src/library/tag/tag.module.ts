@@ -1,9 +1,16 @@
 import { Module } from '@nestjs/common';
-import { TagService } from './tag.service';
+import { JwtStrategy } from 'src/common/strategies/jwt.strategy';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { Tag } from './tag.entity';
+
 import { TagController } from './tag.controller';
 
+import { TagService } from './tag.service';
+
 @Module({
-  providers: [TagService],
+  imports: [TypeOrmModule.forFeature([Tag])],
+  providers: [TagService, JwtStrategy],
   controllers: [TagController]
 })
 export class TagModule {}

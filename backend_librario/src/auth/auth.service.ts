@@ -63,6 +63,7 @@ export class AuthService {
 
     const payload: JwtPayload = {
       email: findUser.email,
+      id: findUser.id,
     };
     const token: string = this.jwtSvc.sign(payload);
 
