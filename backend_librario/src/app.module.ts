@@ -7,6 +7,7 @@ import { ShelfModule } from './library/shelf/shelf.module';
 import { BooksetModule } from './library/bookset/bookset.module';
 import { CategoryModule } from './library/category/category.module';
 import { TagModule } from './library/tag/tag.module';
+import { FormatModule } from './library/format/format.module';
 import { ReadingsModule } from './reading/readings/readings.module';
 import { GoalsModule } from './reading/goals/goals.module';
 import { BooksModule } from './statistics/books/books.module';
@@ -35,6 +36,7 @@ import { UserModule } from './account/user/user.module';
     BooksetModule,
     CategoryModule,
     TagModule,
+    FormatModule,
     ReadingsModule,
     GoalsModule,
     BooksModule,
