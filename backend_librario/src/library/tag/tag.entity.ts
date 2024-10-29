@@ -1,15 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
 
 import { User } from 'src/account/user/user.entity';
+import { BookTag } from '../book-tag/book-tag.entity';
 
-@Entity('tag')
+@Entity({ name: 'tag' })
 export class Tag {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @ManyToOne(() => User, user => user.tags, { onDelete: 'CASCADE' })
+  user: User;
+
+  @Column({ length: 100 })
   name: string;
 
-  @ManyToOne(() => User, (user) => user.id, { onDelete: 'CASCADE' })
-  user: User;
+  @OneToMany(() => BookTag, bookTag => bookTag.tag)
+  bookTags: BookTag[];
 }
