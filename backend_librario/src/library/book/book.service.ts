@@ -80,12 +80,13 @@ export class BookService {
     bookId: number,
     userId: number,
   ): Promise<BookDetailsDto> {
-    console.log('bookId', bookId, 'userId', userId);
     const book = await this.bookRepository
       .createQueryBuilder('book')
       .leftJoin('book.bookGenres', 'bookgenre')
       .leftJoin('book.bookTags', 'booktag')
       .leftJoin('book.shelfBooks', 'shelfbook')
+      .leftJoin('shelfbook.shelf', 'shelf')
+      .leftJoin('shelf.bookshelf', 'bookshelf')
       .leftJoin('book.booksetBooks', 'booksetbook')
       .select([
         'book.id',
@@ -103,7 +104,7 @@ export class BookService {
         'book.asexpense',
         'GROUP_CONCAT(DISTINCT bookgenre.genreid) AS genres',
         'GROUP_CONCAT(DISTINCT booktag.tagid) AS tags',
-        'GROUP_CONCAT(DISTINCT shelfbook.shelfid) AS shelves',
+        'GROUP_CONCAT(DISTINCT CONCAT_WS(":", bookshelf.id, shelf.id)) AS bookshelf_shelf',
         'GROUP_CONCAT(DISTINCT booksetbook.booksetid) AS booksets',
       ])
       .where('book.id = :bookId', { bookId })
@@ -117,12 +118,30 @@ export class BookService {
       );
     }
 
-    // Relaciones intermedias
+    const bookshelfShelves = book.bookshelf_shelf
+      ? book.bookshelf_shelf.split(',').reduce((acc, item) => {
+          const [bookshelfId, shelfId] = item.split(':').map(Number);
+          const existingBookshelf = acc.find(
+            (b) => b.bookshelfId === bookshelfId,
+          );
+          if (existingBookshelf) {
+            existingBookshelf.shelves.push(shelfId);
+          } else {
+            acc.push({ bookshelfId, shelves: [shelfId] });
+          }
+          return acc;
+        }, [])
+      : [];
+
+    console.log('bookshelfShelves', book);
+
+    delete book.bookshelf_shelf;
+
     return {
       ...book,
       genres: book.genres ? book.genres.split(',').map(Number) : [],
       tags: book.tags ? book.tags.split(',').map(Number) : [],
-      shelves: book.shelves ? book.shelves.split(',').map(Number) : [],
+      bookshelfShelves,
       booksets: book.booksets ? book.booksets.split(',').map(Number) : [],
     };
   }

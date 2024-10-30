@@ -1,6 +1,6 @@
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 
 import { UpdateBooksetDto } from './dto/update-bookset.dto';
 
@@ -33,9 +33,21 @@ export class BooksetService {
         user: { id: userId },
       });
 
-      const booksetBooks = bookIds.map((bookId) => ({
+      //Agrega el libro solo si le pertenece al usuario
+      const userBooks = await manager.find('Book', {
+        where: { id: In(bookIds.map(Number)), user: { id: userId } },
+      });
+
+      if (userBooks.length !== bookIds.length) {
+        throw new HttpException(
+          'One or more books do not belong to the user',
+          403,
+        );
+      }
+
+      const booksetBooks = userBooks.map((userBook) => ({
         booksetId: newBookset.id,
-        bookId,
+        bookId: userBook.id,
       }));
 
       await manager.getRepository(BooksetBook).save(booksetBooks);
