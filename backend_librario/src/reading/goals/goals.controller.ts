@@ -11,10 +11,14 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { GoalsService } from './goals.service';
 
 @Controller('reading/goals')
 @UseGuards(JwtAuthGuard)
 export class GoalsController {
+
+  constructor(private goalSvc: GoalsService) {}
+
   @Post()
   async createGoal(@Req() req: Request, @Body() body: any) {
     const userId = req.user['id'];

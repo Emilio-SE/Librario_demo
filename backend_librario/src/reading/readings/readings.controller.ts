@@ -11,10 +11,14 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { ReadingsService } from './readings.service';
 
 @Controller('reading/readings')
 @UseGuards(JwtAuthGuard)
 export class ReadingsController {
+
+  constructor(private readingSvc: ReadingsService) {}
+
   @Post()
   async createReading(@Req() req: Request, @Body() body: any) {
     const userId = req.user['id'];
