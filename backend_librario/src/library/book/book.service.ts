@@ -28,7 +28,7 @@ export class BookService {
     bookId: number,
     userId: number,
   ): Promise<Book> {
-    return await this.validateUtils.findAndValidateEntity(
+    return await this.validateUtils.findByRepository(
       this.bookRepository,
       {
         where: { id: bookId, user: { id: userId } },

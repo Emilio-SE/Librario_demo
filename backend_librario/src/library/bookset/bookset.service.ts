@@ -1,14 +1,25 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, EntityManager, In, Repository } from 'typeorm';
 
 import { UpdateBooksetDto } from './dto/update-bookset.dto';
 
 import { Bookset } from './bookset.entity';
 import { BooksetBook } from '../bookset-book/bookset-book.entity';
+import { Book } from '../book/book.entity';
+
+import { ValidateUtils } from 'src/common/utils/validate.utils';
+import { BooksetPreviewDto } from './dto/bookset-preview.dto';
 
 @Injectable()
 export class BooksetService {
+  private readonly validateUtils = new ValidateUtils();
+
   constructor(
     @InjectRepository(Bookset)
     private readonly booksetRepository: Repository<Bookset>,
@@ -16,33 +27,25 @@ export class BooksetService {
     private readonly dataSource: DataSource,
   ) {}
 
+  // -- Create a bookset
+
   async createBookset(
     userId: number,
     name: string,
     bookIds: number[],
   ): Promise<Bookset> {
     return await this.dataSource.transaction(async (manager) => {
-      const user = await manager.findOne('User', { where: { id: userId } });
-
-      if (!user) {
-        throw new HttpException('User not found', 404);
-      }
-
       const newBookset = await manager.getRepository(Bookset).save({
         name,
         user: { id: userId },
       });
 
-      //Agrega el libro solo si le pertenece al usuario
       const userBooks = await manager.find('Book', {
         where: { id: In(bookIds.map(Number)), user: { id: userId } },
       });
 
       if (userBooks.length !== bookIds.length) {
-        throw new HttpException(
-          'One or more books do not belong to the user',
-          403,
-        );
+        throw new HttpException('One or more books not found', 403);
       }
 
       const booksetBooks = userBooks.map((userBook) => ({
@@ -59,7 +62,9 @@ export class BooksetService {
     });
   }
 
-  async getUserBooksets(userId: number) {
+  // -- Get bookset preview
+
+  async getBooksetPreview(userId: number) {
     const booksets = await this.booksetRepository
       .createQueryBuilder('bookset')
       .leftJoinAndSelect('bookset.booksetBooks', 'booksetBooks')
@@ -75,11 +80,23 @@ export class BooksetService {
     return booksets;
   }
 
+  // -- Get bookset details
+
   async getBooksetDetails(userId: number, booksetId: number) {
-    const bookset = await this.booksetRepository
+    const bookset = await this.fetchBooksetDetails(userId, booksetId);
+
+    if (bookset.length === 0) {
+      throw new NotFoundException('Bookset not found.');
+    }
+
+    return this.formatBooksetDetails(bookset);
+  }
+
+  private async fetchBooksetDetails(userId: number, booksetId: number) {
+    return await this.booksetRepository
       .createQueryBuilder('bookset')
-      .leftJoinAndSelect('bookset.booksetBooks', 'booksetBooks')
-      .leftJoinAndSelect('booksetBooks.book', 'book')
+      .leftJoin('bookset.booksetBooks', 'booksetBooks')
+      .leftJoin('booksetBooks.book', 'book')
       .select([
         'bookset.id AS id',
         'bookset.name AS name',
@@ -90,13 +107,9 @@ export class BooksetService {
       .where('bookset.id = :booksetId', { booksetId })
       .andWhere('bookset.userId = :userId', { userId })
       .getRawMany();
+  }
 
-    if (bookset.length === 0) {
-      throw new NotFoundException(
-        'Bookset not found or does not belong to this user',
-      );
-    }
-
+  private formatBooksetDetails(bookset: any[]): BooksetPreviewDto {
     const books = bookset
       .filter((item) => item.bookId !== null)
       .map((item) => ({
@@ -112,45 +125,29 @@ export class BooksetService {
     };
   }
 
+  // -- Uupdate a bookset
+
   async updateBookset(
     userId: number,
     booksetId: number,
     updateData: UpdateBooksetDto,
   ) {
-    const { name, book: book } = updateData;
+    const { name, book } = updateData;
 
     return this.dataSource.transaction(async (manager) => {
-      const booksetRepository = manager.getRepository(Bookset);
-      const booksetBookRepository = manager.getRepository(BooksetBook);
+      const bookset = await this.validateUtils.findByRepository(
+        manager,
+        {
+          where: { id: booksetId, user: { id: userId } },
+        },
+        'Bookset',
+        Bookset,
+      );
 
-      const bookset = await booksetRepository.findOne({
-        where: { id: booksetId, user: { id: userId } },
-      });
-
-      if (!bookset) {
-        throw new NotFoundException(
-          'Bookset not found or does not belong to user',
-        );
-      }
-
-      bookset.name = name;
-      await booksetRepository.save(bookset);
+      await this.updateBooksetName(manager, bookset, name);
 
       if (book !== undefined) {
-        if (book.length === 0) {
-          // Eliminar todas las relaciones si el arreglo está vacío
-          await booksetBookRepository.delete({ booksetId: booksetId });
-        } else {
-          // Eliminar todas las relaciones actuales con los libros antes de agregar nuevas
-          await booksetBookRepository.delete({ booksetId: booksetId });
-
-          // Crear nuevas relaciones solo si hay IDs en el arreglo `books`
-          const booksetBooks = book.map((bookId) => ({
-            booksetId: booksetId,
-            bookId,
-          }));
-          await booksetBookRepository.insert(booksetBooks);
-        }
+        await this.updateBooksetBooks(manager, userId, booksetId, book);
       }
 
       return {
@@ -161,23 +158,66 @@ export class BooksetService {
     });
   }
 
+  private async updateBooksetName(
+    manager: EntityManager,
+    bookset: Bookset,
+    name: string,
+  ) {
+    bookset.name = name;
+    await manager.getRepository(Bookset).save(bookset);
+  }
+
+  private async validateBooksOwnership(
+    manager: EntityManager,
+    userId: number,
+    bookIds: number[],
+  ) {
+    const books = await manager
+      .getRepository(Book)
+      .createQueryBuilder('book')
+      .where('book.id IN (:...bookIds)', { bookIds })
+      .andWhere('book.userId = :userId', { userId })
+      .getMany();
+
+    if (books.length !== bookIds.length) {
+      throw new NotFoundException('One or more books not found.');
+    }
+  }
+
+  private async updateBooksetBooks(
+    manager: EntityManager,
+    userId: number,
+    booksetId: number,
+    bookIds: number[],
+  ) {
+    const booksetBookRepository = manager.getRepository(BooksetBook);
+
+    if (bookIds.length === 0) {
+      await booksetBookRepository.delete({ booksetId });
+    } else {
+      await this.validateBooksOwnership(manager, userId, bookIds);
+
+      await booksetBookRepository.delete({ booksetId });
+      const booksetBooks = bookIds.map((bookId) => ({ booksetId, bookId }));
+      await booksetBookRepository.insert(booksetBooks);
+    }
+  }
+
+  // -- Delete a bookset
+
   async deleteBookset(userId: number, booksetId: number) {
     return this.dataSource.transaction(async (manager) => {
       const booksetRepository = manager.getRepository(Bookset);
 
-      const bookset = await booksetRepository.findOne({
-        where: { id: booksetId, user: { id: userId } },
-      });
-
-      if (!bookset) {
-        throw new NotFoundException(
-          'Bookset not found or does not belong to user',
-        );
-      }
+      const bookset = await this.validateUtils.findByRepository(
+        booksetRepository,
+        { where: { id: booksetId, user: { id: userId } } },
+        'Bookset',
+      );
 
       await booksetRepository.remove(bookset);
 
-      return { message: 'Bookset deleted successfully' };
+      return HttpStatus.OK;
     });
   }
 }

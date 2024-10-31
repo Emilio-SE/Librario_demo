@@ -40,7 +40,7 @@ export class BooksetController {
   @Get()
   getBooksetPreview(@Req() req: Request): Promise<any[]> {
     const userId = req.user['id'];
-    return this.booksetService.getUserBooksets(userId);
+    return this.booksetService.getBooksetPreview(userId);
   }
 
   @Get(':bookset_id')
