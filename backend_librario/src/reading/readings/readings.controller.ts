@@ -12,29 +12,29 @@ import {
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ReadingsService } from './readings.service';
+import { UpdateReadingDto } from './dto/update-read.dto';
 
 @Controller('reading/readings')
 @UseGuards(JwtAuthGuard)
 export class ReadingsController {
-
   constructor(private readingSvc: ReadingsService) {}
 
   @Post()
   async createReading(@Req() req: Request, @Body() body: any) {
     const userId = req.user['id'];
-    return 'Create Reading';
+    return this.readingSvc.createReading(userId, body);
   }
 
-  @Get('preview')
-  async getBooksPreview(@Req() req: Request) {
+  @Get('book/:book_id')
+  async getBooksPreview(@Req() req: Request, @Param('book_id') bookId: string) {
     const userId = req.user['id'];
-    return 'Books Preview';
+    return this.readingSvc.getBookSummary(+bookId, userId);
   }
 
   @Get()
-  async getReadings(@Req() req: Request) {
+  async getReadingsPreview(@Req() req: Request) {
     const userId = req.user['id'];
-    return 'Readings';
+    return this.readingSvc.getAllReadings(userId);
   }
 
   @Get(':reading_id')
@@ -43,17 +43,17 @@ export class ReadingsController {
     @Param('reading_id') readingId: string,
   ) {
     const userId = req.user['id'];
-    return 'Reading';
+    return this.readingSvc.getReadingDetails(userId, +readingId);
   }
 
   @Patch(':reading_id')
   async updateReading(
     @Req() req: Request,
     @Param('reading_id') readingId: string,
-    @Body() body: any,
+    @Body() body: UpdateReadingDto,
   ) {
     const userId = req.user['id'];
-    return 'Update Reading';
+    return this.readingSvc.updateReading(userId, +readingId, body);
   }
 
   @Delete(':reading_id')
@@ -62,6 +62,6 @@ export class ReadingsController {
     @Param('reading_id') readingId: string,
   ) {
     const userId = req.user['id'];
-    return 'Delete Reading';
+    return this.readingSvc.deleteReading(userId, +readingId);
   }
 }
