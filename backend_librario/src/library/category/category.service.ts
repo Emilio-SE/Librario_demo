@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { User } from 'src/account/user/user.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { GenreDto } from './dto/genre-previews.dto';
-import { CategoryResult } from './interfaces/category.interface';
+import { CategoryResultDto } from './dto/category-result.dto';
 import { MessageResponse } from 'src/common/interfaces/response.interface';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class CategoryService {
   async createCategory(
     userId: number,
     createCategoryDto: CreateCategoryDto,
-  ): Promise<CategoryResult> {
+  ): Promise<CategoryResultDto> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     const newCategory = this.genreRepository.create({
       ...createCategoryDto,
@@ -31,7 +31,7 @@ export class CategoryService {
     return {
       id: result.id,
       name: result.name,
-    } as CategoryResult;
+    } as CategoryResultDto;
   }
 
   async getPreviewCategories(id: number): Promise<GenreDto[]> {

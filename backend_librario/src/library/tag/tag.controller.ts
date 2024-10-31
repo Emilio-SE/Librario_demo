@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
@@ -8,8 +8,6 @@ import { TagPreviewsDto } from './dto/tag-previews.dto';
 import { Tag } from './tag.entity';
 
 import { TagService } from './tag.service';
-
-import { MessageResponse } from 'src/common/interfaces/response.interface';
 
 @Controller('library/tag')
 @UseGuards(JwtAuthGuard)
@@ -35,7 +33,7 @@ export class TagController {
   @Delete(":tagId")
     async deleteTag(
         @Req() req: Request,
-    ): Promise<MessageResponse> {
+    ): Promise<HttpStatus> {
         const tagId: number = parseInt(req.params.tagId);
         return this.tagService.deleteTag(req.user['id'], tagId);
     }

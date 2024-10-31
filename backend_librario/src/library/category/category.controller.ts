@@ -4,7 +4,7 @@ import { Request } from 'express';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { GenreDto } from './dto/genre-previews.dto';
-import { CategoryResult } from './interfaces/category.interface';
+import { CategoryResultDto } from './dto/category-result.dto';
 import { MessageResponse } from 'src/common/interfaces/response.interface';
 
 @Controller('library/category')
@@ -16,7 +16,7 @@ export class CategoryController {
   createCategory(
     @Req() req: Request,
     @Body() body: CreateCategoryDto,
-  ): Promise<CategoryResult> {
+  ): Promise<CategoryResultDto> {
     return this.categorySvc.createCategory(req.user['id'], body);
   }
 
