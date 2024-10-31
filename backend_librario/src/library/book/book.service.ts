@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Not, Repository } from 'typeorm';
 
@@ -12,15 +12,33 @@ import { BookPreviewDto } from './dto/book-preview.dto';
 import { BookDetailsDto } from './dto/book-details.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 
-import { MessageResponse } from 'src/common/interfaces/response.interface';
+import { ValidateUtils } from 'src/common/utils/validate.utils';
 
 @Injectable()
 export class BookService {
+  private readonly validateUtils = new ValidateUtils();
+
   constructor(
     private readonly dataSource: DataSource,
     @InjectRepository(Book)
     private readonly bookRepository: Repository<Book>,
   ) {}
+
+  private async findAndValidateBook(
+    bookId: number,
+    userId: number,
+  ): Promise<Book> {
+    return await this.validateUtils.findAndValidateEntity(
+      this.bookRepository,
+      {
+        where: { id: bookId, user: { id: userId } },
+        relations: ['bookGenres', 'bookTags', 'shelfBooks', 'booksetBooks'],
+      },
+      'Book',
+    );
+  }
+
+  // --- Create operation ---
 
   async createBook(
     createBookDto: CreateBookDto,
@@ -36,39 +54,37 @@ export class BookService {
         });
         const savedBook = await transactionalEntityManager.save(newBook);
 
-        // Insertar relaciones en BookGenre
-        if (genre && genre.length) {
-          const bookGenres = genre.map((genreId) => ({
-            bookId: savedBook['id'],
-            genreId,
-          }));
-          await transactionalEntityManager.insert(BookGenre, bookGenres);
-        }
+        const insertRelations = async (Entity, ids, fieldNames) => {
+          if (ids && ids.length) {
+            const entities = ids.map((id) => ({
+              [fieldNames.bookField]: savedBook.id,
+              [fieldNames.relatedField]: id,
+            }));
+            await transactionalEntityManager.insert(Entity, entities);
+          }
+        };
 
-        // Insertar relaciones en BookTag
-        if (tag && tag.length) {
-          const bookTags = tag.map((tagId) => ({
-            bookId: savedBook['id'],
-            tagId,
-          }));
-          await transactionalEntityManager.insert(BookTag, bookTags);
-        }
-
-        // Insertar relaciones en BooksetBook
-        if (bookset && bookset.length) {
-          const booksetBooks = bookset.map((booksetId) => ({
-            booksetId,
-            bookId: savedBook.id,
-          }));
-          await transactionalEntityManager.insert(BooksetBook, booksetBooks);
-        }
+        await insertRelations(BookGenre, genre, {
+          bookField: 'bookId',
+          relatedField: 'genreId',
+        });
+        await insertRelations(BookTag, tag, {
+          bookField: 'bookId',
+          relatedField: 'tagId',
+        });
+        await insertRelations(BooksetBook, bookset, {
+          bookField: 'bookId',
+          relatedField: 'booksetId',
+        });
 
         return savedBook;
       },
     );
   }
 
-  async getBookSummaries(userId: number): Promise<BookPreviewDto[]> {
+  // --- Read preview operations ---
+
+  async getBookPreview(userId: number): Promise<BookPreviewDto[]> {
     return await this.bookRepository
       .createQueryBuilder('book')
       .select(['book.id', 'book.title', 'book.author', 'book.coverUrl'])
@@ -76,11 +92,26 @@ export class BookService {
       .getRawMany();
   }
 
+  // --- Read details operations --
+
   async getBookDetails(
     bookId: number,
     userId: number,
   ): Promise<BookDetailsDto> {
-    const book = await this.bookRepository
+    const book = await this.fetchBookDetails(bookId, userId);
+    console.log(book);
+    if (!book) {
+      throw new NotFoundException('Book not found.');
+    }
+
+    return this.formatBookDetails(book);
+  }
+
+  private async fetchBookDetails(
+    bookId: number,
+    userId: number,
+  ): Promise<BookDetailsDto | undefined> {
+    return await this.bookRepository
       .createQueryBuilder('book')
       .leftJoin('book.bookGenres', 'bookgenre')
       .leftJoin('book.bookTags', 'booktag')
@@ -113,152 +144,113 @@ export class BookService {
       .andWhere('book.userId = :userId', { userId })
       .groupBy('book.id')
       .getRawOne();
+  }
 
-    if (!book) {
-      throw new NotFoundException(
-        'Book not found or does not belong to this user',
-      );
-    }
-
-    const bookshelfShelves = book.bookshelf_shelf
-      ? book.bookshelf_shelf.split(',').reduce((acc, item) => {
-          const [bookshelfId, shelfId] = item.split(':').map(Number);
-          const existingBookshelf = acc.find(
-            (b) => b.bookshelfId === bookshelfId,
-          );
-          if (existingBookshelf) {
-            existingBookshelf.shelves.push(shelfId);
-          } else {
-            acc.push({ bookshelfId, shelves: [shelfId] });
-          }
-          return acc;
-        }, [])
-      : [];
-
-    console.log('bookshelfShelves', book);
-
-    delete book.bookshelf_shelf;
-
+  private formatBookDetails(book: any): BookDetailsDto {
     return {
       ...book,
-      genres: book.genres ? book.genres.split(',').map(Number) : [],
-      tags: book.tags ? book.tags.split(',').map(Number) : [],
-      bookshelfShelves,
-      booksets: book.booksets ? book.booksets.split(',').map(Number) : [],
+      genres: this.parseIdsString(book.genres),
+      tags: this.parseIdsString(book.tags),
+      bookshelfShelves: this.parseBookshelfShelves(book.bookshelf_shelf),
+      booksets: this.parseIdsString(book.booksets),
     };
   }
+
+  private parseBookshelfShelves(
+    bookshelfShelf: string,
+  ): Array<{ bookshelfId: number; shelves: number[] }> {
+    if (!bookshelfShelf) return [];
+    return bookshelfShelf.split(',').reduce((acc, item) => {
+      const [bookshelfId, shelfId] = item.split(':').map(Number);
+      const bookshelf = acc.find((b) => b.bookshelfId === bookshelfId);
+      bookshelf
+        ? bookshelf.shelves.push(shelfId)
+        : acc.push({ bookshelfId, shelves: [shelfId] });
+      return acc;
+    }, []);
+  }
+
+  private parseIdsString(idsString: string | null): number[] {
+    return idsString ? idsString.split(',').map(Number) : [];
+  }
+
+  // --- Update operation ---
 
   async updateBook(
     bookId: number,
     userId: number,
     updateData: UpdateBookDto,
   ): Promise<Book> {
-    const book = await this.bookRepository.findOne({
-      where: { id: bookId, user: { id: userId } },
-      relations: ['bookGenres', 'bookTags', 'shelfBooks', 'booksetBooks'],
-    });
+    const book = await this.findAndValidateBook(bookId, userId);
 
-    if (!book) {
-      throw new NotFoundException(
-        'Book not found or does not belong to this user',
-      );
-    }
+    await this.updateBookProperties(book, updateData);
 
-    Object.assign(book, updateData);
-    await this.bookRepository.save(book);
-
-    await this.dataSource.transaction(async (transactionalEntityManager) => {
-      if (updateData.genre) {
-        await transactionalEntityManager.delete(BookGenre, {
-          bookId: bookId,
-          genreId: Not(In(updateData.genre)),
-        });
-
-        const existingGenres = book.bookGenres.map((bg) => bg.genreId);
-
-        const newGenres = updateData.genre.filter(
-          (genreId) => !existingGenres.includes(genreId),
-        );
-
-        const bookGenresToInsert = newGenres.map((genreId) => ({
-          bookId,
-          genreId,
-        }));
-        if (bookGenresToInsert.length > 0) {
-          await transactionalEntityManager.insert(
-            BookGenre,
-            bookGenresToInsert,
-          );
-        }
-      }
-
-      if (updateData.tag) {
-        await transactionalEntityManager.delete(BookTag, {
-          bookId: bookId,
-          tagId: Not(In(updateData.tag)),
-        });
-
-        const existingTags = book.bookTags.map((bt) => bt.tagId);
-        const newTags = updateData.tag.filter(
-          (tagId) => !existingTags.includes(tagId),
-        );
-        const bookTagsToInsert = newTags.map((tagId) => ({
-          bookId,
-          tagId,
-        }));
-        if (bookTagsToInsert.length > 0) {
-          await transactionalEntityManager.insert(BookTag, bookTagsToInsert);
-        }
-      }
-
-      if (updateData.bookset) {
-        await transactionalEntityManager.delete(BooksetBook, {
-          bookId: bookId,
-          booksetId: Not(In(updateData.bookset)),
-        });
-
-        const existingBooksets = book.booksetBooks.map((bb) => bb.booksetId);
-        const newBooksets = updateData.bookset.filter(
-          (booksetId) => !existingBooksets.includes(booksetId),
-        );
-        const booksetsToInsert = newBooksets.map((booksetId) => ({
-          booksetId,
-          bookId,
-        }));
-        if (booksetsToInsert.length > 0) {
-          await transactionalEntityManager.insert(
-            BooksetBook,
-            booksetsToInsert,
-          );
-        }
-      }
-    });
+    await this.updateBookRelations(bookId, updateData, book);
 
     return book;
   }
 
-  async deleteBook(bookId: number, userId: number): Promise<MessageResponse> {
-    return await this.dataSource.transaction(async (entityManager) => {
-      const book = await entityManager.findOne(Book, {
-        where: { id: bookId, user: { id: userId } },
-      });
-      console.log('book', book);
-      if (!book) {
-        throw new NotFoundException(
-          'Book not found or does not belong to this user',
-        );
+  private async updateBookProperties(
+    book: Book,
+    updateData: UpdateBookDto,
+  ): Promise<void> {
+    Object.assign(book, updateData);
+    await this.bookRepository.save(book);
+  }
+
+  private async updateBookRelations(
+    bookId: number,
+    updateData: UpdateBookDto,
+    book: Book,
+  ): Promise<void> {
+    await this.dataSource.transaction(async (transactionalEntityManager) => {
+      // Eliminar y actualizar BookGenre
+      if (updateData.genre) {
+        await transactionalEntityManager.delete(BookGenre, { bookId });
+        const bookGenres = [...new Set(updateData.genre)].map((genreId) => ({
+          bookId,
+          genreId,
+        }));
+        await transactionalEntityManager.insert(BookGenre, bookGenres);
       }
 
-      //await entityManager.delete(BookGenre, { bookId: book.id });
-      //await entityManager.delete(BookTag, { bookId: book.id });
-      //await entityManager.delete(ShelfBook, { bookId: book.id });
-      //await entityManager.delete(BooksetBook, { bookId: book.id });
+      // Eliminar y actualizar BookTag
+      if (updateData.tag) {
+        await transactionalEntityManager.delete(BookTag, { bookId });
+        const bookTags = [...new Set(updateData.tag)].map((tagId) => ({
+          bookId,
+          tagId,
+        }));
+        await transactionalEntityManager.insert(BookTag, bookTags);
+      }
 
-      await entityManager.delete(Book, book.id);
+      // Eliminar y actualizar BooksetBook
+      if (updateData.bookset) {
+        await transactionalEntityManager.delete(BooksetBook, { bookId });
+        const booksetBooks = [...new Set(updateData.bookset)].map(
+          (booksetId) => ({
+            booksetId,
+            bookId,
+          }),
+        );
+        await transactionalEntityManager.insert(BooksetBook, booksetBooks);
+      }
+    });
+  }
 
-      return {
-        message: 'Book deleted successfully',
-      };
+  // --- Delete operation ---
+
+  async deleteBook(bookId: number, userId: number): Promise<HttpStatus> {
+    return await this.dataSource.transaction(async (entityManager) => {
+      const book = await this.findAndValidateBook(bookId, userId);
+
+      const result = await entityManager.delete(Book, book.id);
+
+      if (result.affected === 0) {
+        throw new NotFoundException('Book not affected');
+      } else {
+        return HttpStatus.OK;
+      }
     });
   }
 }
