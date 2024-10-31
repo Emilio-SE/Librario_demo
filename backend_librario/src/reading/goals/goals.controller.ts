@@ -12,6 +12,7 @@ import {
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { GoalsService } from './goals.service';
+import { CreateGoalDto } from './dto/create-goal.dto';
 
 @Controller('reading/goals')
 @UseGuards(JwtAuthGuard)
@@ -20,21 +21,21 @@ export class GoalsController {
   constructor(private goalSvc: GoalsService) {}
 
   @Post()
-  async createGoal(@Req() req: Request, @Body() body: any) {
+  async createGoal(@Req() req: Request, @Body() body: CreateGoalDto) {
     const userId = req.user['id'];
-    return 'Create Goal';
+    return this.goalSvc.createGoal(body, userId);
   }
 
   @Get()
   async getGoalsPreview(@Req() req: Request) {
     const userId = req.user['id'];
-    return 'Goals Preview';
+    return this.goalSvc.getPreviewGoals(userId);
   }
 
   @Get(':goal_id')
   async getGoalDetails(@Req() req: Request, @Param('goal_id') goalId: string) {
     const userId = req.user['id'];
-    return 'Goal';
+    return this.goalSvc.getGoalDetails(userId, +goalId);
   }
 
   @Patch(':goal_id')
@@ -44,12 +45,12 @@ export class GoalsController {
     @Body() body: any,
   ) {
     const userId = req.user['id'];
-    return 'Update Goal';
+    return this.goalSvc.updateGoal(userId, +goalId, body);
   }
 
   @Delete(':goal_id')
   async deleteGoal(@Req() req: Request, @Param('goal_id') goalId: string) {
     const userId = req.user['id'];
-    return 'Delete Goal';
+    return this.goalSvc.deleteGoal(userId, +goalId);
   }
 }

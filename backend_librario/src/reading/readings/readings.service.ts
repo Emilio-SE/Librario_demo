@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { Reading } from './reading.entity';
@@ -36,11 +36,24 @@ export class ReadingsService {
       );
     }
 
+    if (currentPage > userBook.pages) {
+      throw new HttpException(
+        'Current page is greater than total pages',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    let endReadingDate = null;
+    if(currentPage === userBook.pages) {
+      endReadingDate = new Date();
+    }
+
     const newReading = this.entityManager.create(Reading, {
       book: userBook,
       user: { id: userId },
       currentPage,
       startReadingDate: isNaN(date.getTime()) ? new Date() : date,
+      endReadingDate
     });
 
     return await this.entityManager.save(newReading);
@@ -136,6 +149,7 @@ export class ReadingsService {
     };
   }
 
+
   async updateReading(
     userId: number,
     readingId: number,
@@ -143,16 +157,31 @@ export class ReadingsService {
   ): Promise<Reading> {
     const reading = await this.entityManager.findOne(Reading, {
       where: { id: readingId, user: { id: userId } },
+      relations: ['book'],  // Asegura que se cargue el libro asociado para obtener totalPages
     });
 
+  
     if (!reading) {
       throw new NotFoundException(
         `Reading with id ${readingId} not found for user ${userId}`,
       );
     }
 
-    Object.assign(reading, updateReadingDto);
+    if(updateReadingDto.currentPage > reading.book.pages) {
+      throw new HttpException('Current page is greater than total pages', HttpStatus.BAD_REQUEST);
+    }
 
+    // Actualizamos la lectura con los datos proporcionados
+    Object.assign(reading, updateReadingDto);
+  
+    // Si currentPage es igual a totalPages, asignamos la fecha de finalización
+    if (
+      updateReadingDto.currentPage &&
+      reading.currentPage === reading.book.pages
+    ) {
+      reading.endReadingDate = new Date(); // Fecha actual
+    }
+  
     return await this.entityManager.save(reading);
   }
 
