@@ -42,6 +42,9 @@ export class Book {
     @Column({ type: 'date', nullable: true })
     publicationDate: Date;
 
+    @Column({ type: 'date', nullable: true })
+    acquisitionDate: Date;
+
     @ManyToOne(() => Format, format => format.books, { onDelete: 'SET NULL', nullable: true })
     format: Format;
 
@@ -50,6 +53,9 @@ export class Book {
 
     @Column({ default: false })
     asExpense: boolean;
+
+    @Column({ length: 255, nullable: true })
+    coverUrl: string;
 
     @OneToMany(() => BookGenre, bookGenre => bookGenre.book)
     bookGenres: BookGenre[];

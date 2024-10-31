@@ -44,6 +44,10 @@ export class CreateBookDto {
   publicationDate?: Date;
 
   @IsOptional()
+  @IsDateString()
+  acquisitionDate?: Date;
+
+  @IsOptional()
   @IsNumber()
   format?: DeepPartial<Format>;
 
@@ -54,6 +58,10 @@ export class CreateBookDto {
   @IsOptional()
   @IsBoolean()
   asExpense?: boolean;
+
+  @IsOptional()
+  @IsString()
+  coverUrl?: string;
 
   @IsOptional()
   @IsArray()

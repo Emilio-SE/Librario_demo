@@ -9,9 +9,11 @@ export class BookDetailsDto {
   language?: string;
   pages?: number;
   publicationDate?: Date;
+  acquisitionDate?: Date;
   formatId?: number;
   price?: number;
   asExpense?: boolean;
+  coverUrl?: string;
   genres: number[];
   tags: number[];
   shelves: number[];

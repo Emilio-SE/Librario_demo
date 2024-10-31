@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsNumber, IsBoolean } from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsBoolean, IsDateString } from 'class-validator';
 
 export class UpdateBookDto {
   @IsOptional()
@@ -32,6 +32,14 @@ export class UpdateBookDto {
   @IsOptional()
   @IsNumber()
   pages?: number;
+
+  @IsOptional()
+  @IsDateString()
+  publicationDate?: Date;
+
+  @IsOptional()
+  @IsDateString()
+  acquisitionDate?: Date;
 
   @IsOptional()
   @IsString()

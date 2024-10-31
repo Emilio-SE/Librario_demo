@@ -71,7 +71,7 @@ export class BookService {
   async getBookSummaries(userId: number): Promise<BookPreviewDto[]> {
     return await this.bookRepository
       .createQueryBuilder('book')
-      .select(['book.id', 'book.title', 'book.author'])
+      .select(['book.id', 'book.title', 'book.author', 'book.coverUrl'])
       .where('book.user = :userId', { userId })
       .getRawMany();
   }
@@ -99,9 +99,11 @@ export class BookService {
         'book.language',
         'book.pages',
         'book.publicationdate',
+        'book.acquisitiondate',
         'book.formatId',
         'book.price',
         'book.asexpense',
+        'book.coverUrl',
         'GROUP_CONCAT(DISTINCT bookgenre.genreid) AS genres',
         'GROUP_CONCAT(DISTINCT booktag.tagid) AS tags',
         'GROUP_CONCAT(DISTINCT CONCAT_WS(":", bookshelf.id, shelf.id)) AS bookshelf_shelf',
