@@ -170,8 +170,8 @@ export class ShelfService {
       await this.updateShelfName(shelf, updateShelfDto.name);
     }
 
-    if (updateShelfDto.books !== undefined) {
-      await this.updateShelfBooks(shelf.id, updateShelfDto.books);
+    if (updateShelfDto.book !== undefined) {
+      await this.updateShelfBooks(shelf.id, updateShelfDto.book);
     }
 
     return { message: 'Shelf updated successfully', statusCode: 200 };
