@@ -14,12 +14,18 @@ import { Book } from '../book/book.entity';
 import { CreateShelfDto } from './dto/create-shelf.dto';
 import { UpdateShelfDto } from './dto/update-shelf.dto';
 
+import { ValidateUtils } from 'src/common/utils/validate.utils';
+
 @Injectable()
 export class ShelfService {
+  private readonly validateUtils: ValidateUtils = new ValidateUtils();
+
   constructor(
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
   ) {}
+
+  // -- Create a Shelf
 
   async createShelf(
     userId: number,
@@ -28,15 +34,12 @@ export class ShelfService {
   ) {
     const { name, book } = createShelfDto;
 
-    const bookshelf = await this.entityManager.findOne(Bookshelf, {
-      where: { id: bookshelfId, user: { id: userId } },
-    });
-
-    if (!bookshelf) {
-      throw new ForbiddenException(
-        'El Bookshelf no pertenece al usuario o no existe.',
-      );
-    }
+    await this.validateUtils.findByRepository(
+      this.entityManager,
+      { where: { id: bookshelfId, user: { id: userId } } },
+      'bookshelf',
+      Bookshelf,
+    );
 
     const newShelf = this.entityManager.create(Shelf, {
       name,
@@ -47,37 +50,48 @@ export class ShelfService {
     const savedShelf = await this.entityManager.save(newShelf);
 
     if (book && book.length) {
-      const userBooks = await this.entityManager.find(Book, {
-        where: { id: In(book.map(Number)), user: { id: userId } },
-      });
-
-      if (userBooks.length !== book.length) {
-        throw new ForbiddenException(
-          'Uno o más libros no pertenecen al usuario.',
-        );
-      }
-
-      const shelfBooks = userBooks.map((userBook) => ({
-        shelfId: savedShelf.id,
-        bookId: userBook.id,
-      }));
-      await this.entityManager.insert(ShelfBook, shelfBooks);
+      const userBooks = await this.getUserBooks(userId, book);
+      await this.createShelfBooks(savedShelf.id, userBooks);
     }
 
     return savedShelf;
   }
 
-  async getShelvesForBookshelf(userId: number, bookshelfId: number) {
-
-    const bookshelf = await this.entityManager.findOne(Bookshelf, {
-      where: { id: bookshelfId, user: { id: userId } },
+  private async getUserBooks(
+    userId: number,
+    bookIds: string[],
+  ): Promise<Book[]> {
+    const userBooks = await this.entityManager.find(Book, {
+      where: { id: In(bookIds), user: { id: userId } },
     });
 
-    if (!bookshelf) {
-      throw new NotFoundException(
-        `Bookshelf with id ${bookshelfId} not found for user ${userId}`,
-      );
+    if (userBooks.length !== bookIds.length) {
+      throw new ForbiddenException('One or more books not found.');
     }
+
+    return userBooks;
+  }
+
+  private async createShelfBooks(
+    shelfId: number,
+    books: Book[],
+  ): Promise<void> {
+    const shelfBooks = books.map((book) => ({
+      shelfId,
+      bookId: book.id,
+    }));
+    await this.entityManager.insert(ShelfBook, shelfBooks);
+  }
+
+  // -- Get Shelves for a Bookshelf
+
+  async getShelvesForBookshelf(userId: number, bookshelfId: number) {
+    await this.validateUtils.findByRepository(
+      this.entityManager,
+      { where: { id: bookshelfId, user: { id: userId } } },
+      'Bookshelf',
+      Bookshelf,
+    );
 
     const shelves = await this.entityManager.find(Shelf, {
       where: { bookshelf: { id: bookshelfId } },
@@ -98,29 +112,10 @@ export class ShelfService {
     );
   }
 
+  // -- Get Shelf Details
+
   async getShelfDetails(userId: number, bookshelfId: number, shelfId: number) {
-    const bookshelf = await this.entityManager.findOne(Bookshelf, {
-      where: { id: bookshelfId, user: { id: userId } },
-    });
-
-    if (!bookshelf) {
-      throw new NotFoundException(
-        `Bookshelf with id ${bookshelfId} not found for user ${userId}`,
-      );
-    }
-
-    // Obtener el Shelf específico dentro del Bookshelf
-    const shelf = await this.entityManager.findOne(Shelf, {
-      where: { id: shelfId, bookshelf: { id: bookshelfId } },
-    });
-
-    if (!shelf) {
-      throw new NotFoundException(
-        `Shelf with id ${shelfId} not found in bookshelf ${bookshelfId}`,
-      );
-    }
-
-    console.log(shelf);
+    const shelf = await this.validateShelf(userId, bookshelfId, shelfId);
 
     const books = await this.entityManager
       .createQueryBuilder(Book, 'book')
@@ -140,85 +135,72 @@ export class ShelfService {
     };
   }
 
+  private async validateShelf(
+    userId: number,
+    bookshelfId: number,
+    shelfId: number,
+  ): Promise<Shelf> {
+    await this.validateUtils.findByRepository(
+      this.entityManager,
+      { where: { id: bookshelfId, user: { id: userId } } },
+      'Bookshelf',
+      Bookshelf,
+    );
+
+    return await this.validateUtils.findByRepository(
+      this.entityManager,
+      { where: { id: shelfId, bookshelf: { id: bookshelfId } } },
+      'Shelf',
+      Shelf,
+    );
+  }
+
+  // -- Update a Shelf
+
   async updateShelf(
     userId: number,
     bookshelfId: number,
     shelfId: number,
     updateShelfDto: UpdateShelfDto,
   ) {
-    const { name, books } = updateShelfDto;
+    const shelf = await this.validateShelf(userId, bookshelfId, shelfId);
 
-    const bookshelf = await this.entityManager.findOne(Bookshelf, {
-      where: { id: bookshelfId, user: { id: userId } },
-    });
-
-    if (!bookshelf) {
-      throw new NotFoundException(
-        `Bookshelf with id ${bookshelfId} not found for user ${userId}`,
-      );
+    if (updateShelfDto.name) {
+      await this.updateShelfName(shelf, updateShelfDto.name);
     }
 
-    const shelf = await this.entityManager.findOne(Shelf, {
-      where: { id: shelfId, bookshelf: { id: bookshelfId } },
-    });
-
-    if (!shelf) {
-      throw new NotFoundException(
-        `Shelf with id ${shelfId} not found in bookshelf ${bookshelfId}`,
-      );
-    }
-
-    if (name) {
-      shelf.name = name;
-    }
-
-    await this.entityManager.save(shelf);
-
-    if (books !== undefined) {
-      if (books.length === 0) {
-        await this.entityManager.delete('shelfbook', { shelfId: shelf.id });
-      } else {
-        await this.entityManager.transaction(
-          async (transactionalEntityManager) => {
-            // Eliminar asociaciones previas
-            await transactionalEntityManager.delete('shelfbook', {
-              shelfId: shelf.id,
-            });
-
-            // Insertar nuevas asociaciones
-            const shelfBooks = books.map((bookId) => ({
-              shelfId: shelf.id,
-              bookId,
-            }));
-            await transactionalEntityManager.insert('shelfbook', shelfBooks);
-          },
-        );
-      }
+    if (updateShelfDto.books !== undefined) {
+      await this.updateShelfBooks(shelf.id, updateShelfDto.books);
     }
 
     return { message: 'Shelf updated successfully' };
   }
 
+  private async updateShelfName(shelf: Shelf, newName: string): Promise<void> {
+    shelf.name = newName;
+    await this.entityManager.save(shelf);
+  }
+
+  private async updateShelfBooks(
+    shelfId: number,
+    books: number[],
+  ): Promise<void> {
+    await this.entityManager.transaction(async (transactionalEntityManager) => {
+      // Eliminar asociaciones previas de libros en el shelf
+      await transactionalEntityManager.delete('shelfbook', { shelfId });
+
+      // Insertar nuevas asociaciones si `books` no está vacío
+      if (books.length > 0) {
+        const shelfBooks = books.map((bookId) => ({ shelfId, bookId }));
+        await transactionalEntityManager.insert('shelfbook', shelfBooks);
+      }
+    });
+  }
+
+  // -- Delete a Shelf
+
   async deleteShelf(userId: number, bookshelfId: number, shelfId: number) {
-    const bookshelf = await this.entityManager.findOne(Bookshelf, {
-      where: { id: bookshelfId, user: { id: userId } },
-    });
-
-    if (!bookshelf) {
-      throw new NotFoundException(
-        `Bookshelf with id ${bookshelfId} not found for user ${userId}`,
-      );
-    }
-
-    const shelf = await this.entityManager.findOne(Shelf, {
-      where: { id: shelfId, bookshelf: { id: bookshelfId } },
-    });
-
-    if (!shelf) {
-      throw new NotFoundException(
-        `Shelf with id ${shelfId} not found in bookshelf ${bookshelfId}`,
-      );
-    }
+    const shelf = await this.validateShelf(userId, bookshelfId, shelfId);
 
     await this.entityManager.transaction(async (transactionalEntityManager) => {
       await transactionalEntityManager.delete('shelfbook', {

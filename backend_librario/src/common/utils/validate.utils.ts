@@ -26,21 +26,4 @@ export class ValidateUtils {
     return result;
   }
 
-  public async findByEntity<T>(
-    entityRef: EntityManager,
-    options: FindOneOptions<T>,
-    table: string,
-    entityName: string,
-  ): Promise<T> {
-
-    const entity = await entityRef.findOne(table, options);
-
-    if (!entity) {
-      throw new NotFoundException(
-        `${entityName} not found.`,
-      );
-    }
-
-    return entity;
-  }
 }
