@@ -91,7 +91,7 @@ export class BookService {
       .createQueryBuilder('book')
       .select(['book.id', 'book.title', 'book.author', 'book.coverUrl'])
       .where('book.user = :userId', { userId })
-      .getRawMany();
+      .getMany();
   }
 
   // --- Read details operations --
@@ -101,7 +101,7 @@ export class BookService {
     userId: number,
   ): Promise<BookDetailsDto> {
     const book = await this.fetchBookDetails(bookId, userId);
-    console.log(book);
+
     if (!book) {
       throw new NotFoundException('Book not found.');
     }
@@ -122,21 +122,21 @@ export class BookService {
       .leftJoin('shelf.bookshelf', 'bookshelf')
       .leftJoin('book.booksetBooks', 'booksetbook')
       .select([
-        'book.id',
-        'book.title',
-        'book.author',
-        'book.isbn',
-        'book.description',
-        'book.publisher',
-        'book.edition',
-        'book.language',
-        'book.pages',
-        'book.publicationdate',
-        'book.acquisitiondate',
-        'book.formatId',
-        'book.price',
-        'book.asexpense',
-        'book.coverUrl',
+        'book.id AS id',
+        'book.title AS title',
+        'book.author AS author',
+        'book.isbn AS isbn',
+        'book.description AS description',
+        'book.publisher AS publisher',
+        'book.edition AS edition',
+        'book.language AS language',
+        'book.pages AS pages',
+        'book.publicationdate AS publicationDate',
+        'book.acquisitiondate AS acquisitionDate',
+        'book.formatId AS formatId',
+        'book.price AS price',
+        'book.asexpense AS asExpense',
+        'book.coverUrl AS coverUrl',
         'GROUP_CONCAT(DISTINCT bookgenre.genreid) AS genres',
         'GROUP_CONCAT(DISTINCT booktag.tagid) AS tags',
         'GROUP_CONCAT(DISTINCT CONCAT_WS(":", bookshelf.id, shelf.id)) AS bookshelf_shelf',

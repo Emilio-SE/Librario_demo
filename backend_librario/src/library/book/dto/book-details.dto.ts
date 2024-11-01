@@ -16,6 +16,11 @@ export class BookDetailsDto {
   coverUrl?: string;
   genres: number[];
   tags: number[];
-  shelves: number[];
   booksets: number[];
+  bookshelfShelves: Shelves[];
+}
+
+export interface Shelves {
+  bookshelfId: number;
+  shelves: number[];
 }

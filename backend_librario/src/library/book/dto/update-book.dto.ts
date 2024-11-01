@@ -42,8 +42,8 @@ export class UpdateBookDto {
   acquisitionDate?: Date;
 
   @IsOptional()
-  @IsString()
-  formatId?: number;
+  @IsNumber()
+  format?: number;
 
   @IsOptional()
   @IsNumber()
@@ -52,6 +52,10 @@ export class UpdateBookDto {
   @IsOptional()
   @IsBoolean()
   asExpense?: boolean;
+
+  @IsOptional()
+  @IsString()
+  coverUrl?: string;
 
   @IsOptional()
   @IsNumber({}, { each: true })
