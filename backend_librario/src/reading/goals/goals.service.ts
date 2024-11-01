@@ -9,8 +9,12 @@ import { UpdateGoalDto } from './dto/update-goal.dto';
 import { Goal } from './goals.entity';
 import { Reading } from '../readings/reading.entity';
 
+import { ValidateUtils } from 'src/common/utils/validate.utils';
+
 @Injectable()
 export class GoalsService {
+  private readonly validateUtils: ValidateUtils = new ValidateUtils();
+
   constructor(
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
@@ -25,11 +29,14 @@ export class GoalsService {
     const initialDateObj = new Date(initialDate);
 
     if (isNaN(finalDateObj.getTime()) || isNaN(initialDateObj.getTime())) {
-      throw new Error('Invalid date format');
+      throw new HttpException('Invalid date format', 400);
     }
 
     if (finalDateObj < initialDateObj) {
-      throw new Error('Final date must be greater than initial date');
+      throw new HttpException(
+        'Final date must be greater than initial date',
+        400,
+      );
     }
 
     const newGoal = this.entityManager.create(Goal, {
@@ -71,16 +78,7 @@ export class GoalsService {
   }
 
   async getGoalDetails(userId: number, goalId: number): Promise<GoalDto> {
-    const goal = await this.entityManager.findOne(Goal, {
-      where: { id: goalId, user: { id: userId } },
-    });
-
-    if (!goal) {
-      throw new HttpException(
-        `Goal with id ${goalId} not found for user ${userId}`,
-        404,
-      );
-    }
+    const goal = await this.getGoal(userId, goalId);
 
     const readings = await this.getReadingDetails(userId, goal);
     const currentBooksRead = readings.length;
@@ -120,15 +118,7 @@ export class GoalsService {
     goalId: number,
     updateGoalDto: UpdateGoalDto,
   ): Promise<Goal> {
-    const goal = await this.entityManager.findOne(Goal, {
-      where: { id: goalId, user: { id: userId } },
-    });
-
-    if (!goal) {
-      throw new NotFoundException(
-        `Goal with id ${goalId} not found for user ${userId}`,
-      );
-    }
+    const goal = await this.getGoal(userId, goalId);
 
     Object.assign(goal, updateGoalDto);
 
@@ -136,16 +126,17 @@ export class GoalsService {
   }
 
   async deleteGoal(userId: number, goalId: number): Promise<Goal> {
-    const goal = await this.entityManager.findOne(Goal, {
-      where: { id: goalId, user: { id: userId } },
-    });
-
-    if (!goal) {
-      throw new NotFoundException(
-        `Goal with id ${goalId} not found for user ${userId}`,
-      );
-    }
+    const goal = await this.getGoal(userId, goalId);
 
     return await this.entityManager.remove(goal);
+  }
+
+  private async getGoal(userId: number, goalId: number): Promise<Goal> {
+    return await this.validateUtils.findByRepository(
+      this.entityManager,
+      { where: { id: goalId, user: { id: userId } } },
+      'Goal',
+      Goal,
+    );
   }
 }
