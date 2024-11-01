@@ -1,6 +1,6 @@
-import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, Not, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 
 import { Book } from './book.entity';
 import { BookGenre } from '../book-genre/book-genre.entity';
@@ -13,6 +13,8 @@ import { BookDetailsDto } from './dto/book-details.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 
 import { ValidateUtils } from 'src/common/utils/validate.utils';
+
+import { MessageResponse } from 'src/common/interfaces/response.interface';
 
 @Injectable()
 export class BookService {
@@ -240,7 +242,7 @@ export class BookService {
 
   // --- Delete operation ---
 
-  async deleteBook(bookId: number, userId: number): Promise<HttpStatus> {
+  async deleteBook(bookId: number, userId: number): Promise<MessageResponse> {
     return await this.dataSource.transaction(async (entityManager) => {
       const book = await this.findAndValidateBook(bookId, userId);
 
@@ -249,7 +251,10 @@ export class BookService {
       if (result.affected === 0) {
         throw new NotFoundException('Book not affected');
       } else {
-        return HttpStatus.OK;
+        return {
+          message: 'Book deleted successfully',
+          statusCode: 200,
+        }
       }
     });
   }

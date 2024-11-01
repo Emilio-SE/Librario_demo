@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   Injectable,
-  NotFoundException,
 } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 
@@ -161,6 +160,7 @@ export class BookshelfService {
 
     return {
       message: 'Bookshelf and all associated shelves deleted successfully',
+      statusCode: 200,
     };
   }
 

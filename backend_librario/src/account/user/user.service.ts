@@ -35,6 +35,7 @@ export class UserService {
 
     const response: MessageResponse = {
       message: 'Unknown error',
+      statusCode: 400,
     };
 
     if (!password.password) {

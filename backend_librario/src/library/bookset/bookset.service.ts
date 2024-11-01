@@ -1,6 +1,5 @@
 import {
   HttpException,
-  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -15,6 +14,7 @@ import { Book } from '../book/book.entity';
 
 import { ValidateUtils } from 'src/common/utils/validate.utils';
 import { BooksetPreviewDto } from './dto/bookset-preview.dto';
+import { MessageResponse } from 'src/common/interfaces/response.interface';
 
 @Injectable()
 export class BooksetService {
@@ -205,7 +205,7 @@ export class BooksetService {
 
   // -- Delete a bookset
 
-  async deleteBookset(userId: number, booksetId: number) {
+  async deleteBookset(userId: number, booksetId: number): Promise<MessageResponse> {
     return this.dataSource.transaction(async (manager) => {
       const booksetRepository = manager.getRepository(Bookset);
 
@@ -217,7 +217,10 @@ export class BooksetService {
 
       await booksetRepository.remove(bookset);
 
-      return HttpStatus.OK;
+      return {
+        message: 'Bookset deleted successfully.',
+        statusCode: 200,
+      }
     });
   }
 }

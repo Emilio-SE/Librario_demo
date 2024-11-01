@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Tag } from './tag.entity';
 import { Repository } from 'typeorm';
@@ -9,9 +9,8 @@ import { ValidateUtils } from 'src/common/utils/validate.utils';
 
 @Injectable()
 export class TagService {
-  
   private readonly validity = new ValidateUtils();
-  
+
   constructor(
     @InjectRepository(Tag)
     private readonly tagRepository: Repository<Tag>,
@@ -32,8 +31,7 @@ export class TagService {
     return tags.map((tag) => new TagPreviewsDto(tag.id, tag.name));
   }
 
-  async deleteTag(userId: number, tagId: number): Promise<HttpStatus> {
-    
+  async deleteTag(userId: number, tagId: number): Promise<MessageResponse> {
     const tag = await this.validity.findByRepository(
       this.tagRepository,
       { where: { id: tagId, user: { id: userId } } },
@@ -41,6 +39,6 @@ export class TagService {
     );
 
     await this.tagRepository.remove(tag);
-    return HttpStatus.OK;
+    return { message: 'Tag deleted successfully', statusCode: 200 };
   }
 }

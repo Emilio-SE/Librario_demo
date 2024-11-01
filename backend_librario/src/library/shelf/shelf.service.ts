@@ -15,6 +15,7 @@ import { CreateShelfDto } from './dto/create-shelf.dto';
 import { UpdateShelfDto } from './dto/update-shelf.dto';
 
 import { ValidateUtils } from 'src/common/utils/validate.utils';
+import { MessageResponse } from 'src/common/interfaces/response.interface';
 
 @Injectable()
 export class ShelfService {
@@ -162,7 +163,7 @@ export class ShelfService {
     bookshelfId: number,
     shelfId: number,
     updateShelfDto: UpdateShelfDto,
-  ) {
+  ): Promise<MessageResponse> {
     const shelf = await this.validateShelf(userId, bookshelfId, shelfId);
 
     if (updateShelfDto.name) {
@@ -173,7 +174,7 @@ export class ShelfService {
       await this.updateShelfBooks(shelf.id, updateShelfDto.books);
     }
 
-    return { message: 'Shelf updated successfully' };
+    return { message: 'Shelf updated successfully', statusCode: 200 };
   }
 
   private async updateShelfName(shelf: Shelf, newName: string): Promise<void> {
@@ -199,7 +200,11 @@ export class ShelfService {
 
   // -- Delete a Shelf
 
-  async deleteShelf(userId: number, bookshelfId: number, shelfId: number) {
+  async deleteShelf(
+    userId: number,
+    bookshelfId: number,
+    shelfId: number,
+  ): Promise<MessageResponse> {
     const shelf = await this.validateShelf(userId, bookshelfId, shelfId);
 
     await this.entityManager.transaction(async (transactionalEntityManager) => {
@@ -210,6 +215,6 @@ export class ShelfService {
       await transactionalEntityManager.remove(shelf);
     });
 
-    return { message: 'Shelf deleted successfully' };
+    return { message: 'Shelf deleted successfully', statusCode: 200 };
   }
 }

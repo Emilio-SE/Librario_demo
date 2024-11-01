@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpStatus,
   Patch,
   Post,
   Req,
@@ -19,6 +18,8 @@ import { BookPreviewDto } from './dto/book-preview.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 
 import { BookService } from './book.service';
+
+import { MessageResponse } from 'src/common/interfaces/response.interface';
 
 @Controller('library/book')
 @UseGuards(JwtAuthGuard)
@@ -52,7 +53,7 @@ export class BookController {
   }
 
   @Delete(':book_id')
-  async deleteBook(@Req() req: Request): Promise<HttpStatus> {
+  async deleteBook(@Req() req: Request): Promise<MessageResponse> {
     const bookId = parseInt(req.params['book_id']);
     return this.bookService.deleteBook(bookId, req.user['id']);
   }

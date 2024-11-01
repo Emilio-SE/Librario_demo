@@ -70,6 +70,6 @@ export class CategoryService {
 
     await this.genreRepository.remove(genre);
 
-    return { message: 'Genre deleted' };
+    return { message: 'Genre deleted', statusCode: 200 };
   }
 }

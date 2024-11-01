@@ -38,6 +38,7 @@ export class AuthService {
 
     return {
       message: 'User created successfully',
+      statusCode: 201,
     };
   }
 
