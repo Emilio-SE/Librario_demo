@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { Reading } from './reading.entity';
@@ -6,9 +11,12 @@ import { CreateReadingDto } from './dto/create-read.dto';
 import { Book } from 'src/library/book/book.entity';
 import { UpdateReadingDto } from './dto/update-read.dto';
 import { RequestBookSummaryDto } from './dto/request-book-summary.dto';
+import { ValidateUtils } from 'src/common/utils/validate.utils';
 
 @Injectable()
 export class ReadingsService {
+  private readonly validity = new ValidateUtils();
+
   constructor(
     @InjectEntityManager() private readonly entityManager: EntityManager,
 
@@ -23,18 +31,16 @@ export class ReadingsService {
     const { book, currentPage, startReadingDate } = createReadingDto;
     const date = new Date(startReadingDate);
 
-    const userBook = await this.entityManager.findOne(Book, {
-      where: {
-        id: Number(book),
-        user: { id: userId },
+    const userBook = await this.validity.findByRepository(
+      this.bookRepository,
+      {
+        where: {
+          id: Number(book),
+          user: { id: userId },
+        },
       },
-    });
-
-    if (!userBook) {
-      throw new NotFoundException(
-        `Book with id ${book} not found for user ${userId}`,
-      );
-    }
+      'Book',
+    );
 
     if (currentPage > userBook.pages) {
       throw new HttpException(
@@ -44,7 +50,7 @@ export class ReadingsService {
     }
 
     let endReadingDate = null;
-    if(currentPage === userBook.pages) {
+    if (currentPage === userBook.pages) {
       endReadingDate = new Date();
     }
 
@@ -53,7 +59,7 @@ export class ReadingsService {
       user: { id: userId },
       currentPage,
       startReadingDate: isNaN(date.getTime()) ? new Date() : date,
-      endReadingDate
+      endReadingDate,
     });
 
     return await this.entityManager.save(newReading);
@@ -88,18 +94,14 @@ export class ReadingsService {
     bookId: number,
     userId: number,
   ): Promise<RequestBookSummaryDto> {
-    
-    console.log('bookId', bookId, 'userId', userId);
-    const book = await this.bookRepository.findOne({
-      where: { id: bookId, user: { id: userId } },
-      select: ['id', 'title', 'author', 'pages'],
-    });
-
-    if (!book) {
-      throw new NotFoundException(
-        `Book with id ${bookId} not found for user ${userId}`,
-      );
-    }
+    const book = await this.validity.findByRepository(
+      this.bookRepository,
+      {
+        where: { id: bookId, user: { id: userId } },
+        select: ['id', 'title', 'author', 'pages'],
+      },
+      'Book',
+    );
 
     return {
       id: book.id,
@@ -130,9 +132,7 @@ export class ReadingsService {
       .getRawOne();
 
     if (!reading) {
-      throw new NotFoundException(
-        `Reading with id ${readingId} not found for user ${userId}`,
-      );
+      throw new NotFoundException(`Reading not found`);
     }
 
     return {
@@ -149,52 +149,49 @@ export class ReadingsService {
     };
   }
 
-
   async updateReading(
     userId: number,
     readingId: number,
     updateReadingDto: UpdateReadingDto,
   ): Promise<Reading> {
-    const reading = await this.entityManager.findOne(Reading, {
-      where: { id: readingId, user: { id: userId } },
-      relations: ['book'],  // Asegura que se cargue el libro asociado para obtener totalPages
-    });
+    const reading = await this.validity.findByRepository(
+      this.entityManager,
+      {
+        where: { id: readingId, user: { id: userId } },
+        relations: ['book'],
+      },
+      'Reading',
+      Reading,
+    );
 
-  
-    if (!reading) {
-      throw new NotFoundException(
-        `Reading with id ${readingId} not found for user ${userId}`,
+    if (updateReadingDto.currentPage > reading.book.pages) {
+      throw new HttpException(
+        'Current page is greater than total pages',
+        HttpStatus.BAD_REQUEST,
       );
     }
 
-    if(updateReadingDto.currentPage > reading.book.pages) {
-      throw new HttpException('Current page is greater than total pages', HttpStatus.BAD_REQUEST);
-    }
-
-    // Actualizamos la lectura con los datos proporcionados
     Object.assign(reading, updateReadingDto);
-  
-    // Si currentPage es igual a totalPages, asignamos la fecha de finalización
+
     if (
       updateReadingDto.currentPage &&
       reading.currentPage === reading.book.pages
     ) {
-      reading.endReadingDate = new Date(); // Fecha actual
+      reading.endReadingDate = new Date();
     }
-  
+
     return await this.entityManager.save(reading);
   }
 
   async deleteReading(userId: number, readingId: number): Promise<Reading> {
-    const reading = await this.entityManager.findOne(Reading, {
-      where: { id: readingId, user: { id: userId } },
-    });
-
-    if (!reading) {
-      throw new NotFoundException(
-        `Reading with id ${readingId} not found for user ${userId}`,
-      );
-    }
+    const reading = await this.validity.findByRepository(
+      this.entityManager,
+      {
+        where: { id: readingId, user: { id: userId } },
+      },
+      'Reading',
+      Reading,
+    );
 
     return await this.entityManager.remove(reading);
   }
