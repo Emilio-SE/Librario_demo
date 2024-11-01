@@ -15,13 +15,12 @@ export class MoneyService {
         .select('EXTRACT(MONTH FROM book.acquisitionDate) AS month')
         .addSelect('SUM(book.price) AS totalSpent')
         .where('book.userId = :userId', { userId })
-        .andWhere('book.asExpense = true') // Solo libros marcados como gasto
+        .andWhere('book.asExpense = true')
         .andWhere('EXTRACT(YEAR FROM book.acquisitionDate) = :year', { year: currentYear })
         .groupBy('month')
         .orderBy('month', 'ASC')
         .getRawMany();
   
-      // Formatear el resultado para incluir todos los meses en la respuesta
       const monthlyExpenses = Array.from({ length: 12 }, (_, index) => {
         const monthData = expenses.find((e) => e.month === index + 1);
         return {
