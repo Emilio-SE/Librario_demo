@@ -12,7 +12,7 @@ export class ValidateUtils {
     let result = null;
 
     if(repository instanceof EntityManager){
-      result = repository.getRepository(entity).findOne(options);
+      result = await repository.getRepository(entity).findOne(options);
     }else{
       result = await repository.findOne(options);
     }

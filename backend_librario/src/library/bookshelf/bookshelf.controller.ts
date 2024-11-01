@@ -34,7 +34,7 @@ export class BookshelfController {
   @Get()
   getBookshelvesPreview(@Req() req: Request) {
     const userId = req.user['id'];
-    return this.bookshelfSvc.getBookshelves(userId);
+    return this.bookshelfSvc.getBookshefPreview(userId);
   }
 
   @Get(':bookshelf_id')
