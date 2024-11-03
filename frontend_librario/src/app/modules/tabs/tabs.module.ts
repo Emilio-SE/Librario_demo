@@ -15,11 +15,23 @@ const routes: Routes = [
       {
         path: 'library',
         loadChildren: () =>
-          import('../library/books/components/books/books.module').then((m) => m.BooksPageModule),
+          import('../library/library/library.module').then(
+            (m) => m.LibraryPageModule
+          ),
       },
       {
         path: 'readings',
-        loadChildren: () => import('../readings/goals/components/goals/goals.module').then( m => m.GoalsPageModule)
+        loadChildren: () =>
+          import('../readings/readings/readings.module').then(
+            (m) => m.ReadingsPageModule
+          ),
+      },
+      {
+        path: 'statistics',
+        loadChildren: () =>
+          import('../statistics/statistics/statistics.module').then(
+            (m) => m.StatisticsPageModule
+          ),
       },
       {
         path: 'account',

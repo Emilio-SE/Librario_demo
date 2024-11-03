@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title class="title-md">Biblioteca</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [scrollable]="true" [(ngModel)]="selectedSegment">
+      <ion-segment-button value="library">
+        <ion-label class="paragraph-lg">Libros</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="bookshelf">
+        <ion-label class="paragraph-lg">Librerios</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="bookset">
+        <ion-label class="paragraph-lg">Booksets</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="other">
+        <ion-label class="paragraph-lg">Otros</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="example-content">{{ contentMap[selectedSegment] }}</div>
+  <!-- <ng-container *ngComponentOutlet="componentMap[selectedSegment]"></ng-container> -->
+</ion-content>

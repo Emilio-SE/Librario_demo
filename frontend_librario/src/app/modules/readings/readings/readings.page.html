@@ -1,0 +1,25 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title class="title-md">Mis lecturas</ion-title>
+    <ion-buttons slot="primary">
+      <ion-button>
+        <ion-icon slot="icon-only" ios="ellipsis-vertical" md="ellipsis-vertical" class="icon-button"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [scrollable]="true" [(ngModel)]="selectedSegment">
+      <ion-segment-button value="reading">
+        <ion-label class="paragraph-lg">Lecturas</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="goal">
+        <ion-label class="paragraph-lg">Metas</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div>{{ contentMap[selectedSegment] }}</div>
+  <!-- <ng-container *ngComponentOutlet="componentMap[selectedSegment]"></ng-container> -->
+</ion-content>
