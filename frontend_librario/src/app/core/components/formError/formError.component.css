@@ -1,0 +1,4 @@
+.invalid-input {
+    color: var(--ion-color-danger);
+    user-select: none;
+}

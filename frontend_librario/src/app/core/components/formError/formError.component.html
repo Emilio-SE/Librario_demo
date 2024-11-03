@@ -1,0 +1,26 @@
+@if (control?.invalid && (control?.dirty || control?.touched)) {
+  <div class="invalid-input">
+    @for (errorType of validate; track $index) {
+      @if (control?.errors?.[errorType]) {
+        @switch (errorType) {
+          @case ('minlength') {
+            <div class="paragraph-sm">
+              {{ messages[errorType].replace('{0}', control?.errors?.[errorType]?.requiredLength) }}
+            </div>
+          }
+          @case ('maxlength') {
+            <div class="paragraph-sm">
+              {{ messages[errorType].replace('{0}', control?.errors?.[errorType]?.requiredLength) }}
+            </div>
+          }
+          @default {
+            <div class="paragraph-sm">
+              {{ messages[errorType] }}
+            </div>
+          }
+
+        }
+      }
+    }
+  </div>
+}

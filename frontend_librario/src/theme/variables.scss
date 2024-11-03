@@ -1,2 +1,109 @@
 // For information on how to create your own theme, please see:
 // http://ionicframework.com/docs/theming/
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+:root {
+
+  // Colors
+
+  --ion-color-primary: #ff8c61;
+  --ion-color-primary-rgb: 255, 140, 97;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #e07d54;
+  --ion-color-primary-tint: #ff9776;
+
+  --ion-color-secondary: #fbeae8;
+  --ion-color-secondary-rgb: 251, 234, 232;
+  --ion-color-secondary-contrast: #000000;
+  --ion-color-secondary-contrast-rgb: 0, 0, 0;
+  --ion-color-secondary-shade: #e0d2d0;
+  --ion-color-secondary-tint: #f9f0ef;
+
+  --ion-color-tertiary: #ad726b;
+  --ion-color-tertiary-rgb: 173, 114, 107;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #97625b;
+  --ion-color-tertiary-tint: #b57f78;
+
+  --ion-color-success: #56f856;
+  --ion-color-success-rgb: 86, 248, 86;
+  --ion-color-success-contrast: #000;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #4cd64c;
+  --ion-color-success-tint: #6eff6e;
+
+  --ion-color-warning: #ffcd61;
+  --ion-color-warning-rgb: 255, 205, 97;
+  --ion-color-warning-contrast: #000;
+  --ion-color-warning-contrast-rgb: 255, 255, 255;
+  --ion-color-warning-shade: #e0b556;
+  --ion-color-warning-tint: #ffda77;
+
+  --ion-color-danger: #ff6161;
+  --ion-color-danger-rgb: 255, 97, 97;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #e05555;
+  --ion-color-danger-tint: #ff7979;
+
+  --ion-background-color: #fdf5f4;
+
+  --color-primary-50: #fff4ef;
+  --color-primary-100: #ffdbce;
+  --color-primary-200: #ffcab6;
+  --color-primary-300: #ffb295;
+  --color-primary-400: #ffa381;
+  --color-primary-500: #ff8c61;
+  --color-primary-600: #e87f58;
+  --color-primary-700: #b56345;
+  --color-primary-800: #8c4d35;
+  --color-primary-900: #6b3b29;
+
+  --color-secondary-50: #fffdfd;
+  --color-secondary-100: #fef8f8;
+  --color-secondary-200: #fdf5f4;
+  --color-secondary-300: #fcf1f0;
+  --color-secondary-400: #fceeed;
+  --color-secondary-500: #fbeae8;
+  --color-secondary-600: #e4d5d3;
+  --color-secondary-700: #b2a6a5;
+  --color-secondary-800: #8a8180;
+  --color-secondary-900: #696261;
+
+  --color-tertiary-50: #f7f1f0;
+  --color-tertiary-100: #e6d3d1;
+  --color-tertiary-200: #d9bebb;
+  --color-tertiary-300: #c8a19c;
+  --color-tertiary-400: #bd8e89;
+  --color-tertiary-500: #ad726b;
+  --color-tertiary-600: #9d6861;
+  --color-tertiary-700: #7b514c;
+  --color-tertiary-800: #5f3f3b;
+  --color-tertiary-900: #49302d;
+
+  // Typography
+
+  --ion-font-family: "Poppins";
+
+  --title-font-size: 32px; 
+  --title-line-height: 40px; 
+  --title-letter-spacing: -0.02em; 
+
+  --subtitle-font-size: 24px;
+  --subtitle-line-height: 32px;
+
+  --body-font-size-lg: 20px;
+  --body-line-height-lg: 24px;
+
+  --body-font-size-m: 16px;
+  --body-line-height-m: 24px;
+
+  --body-font-size-s: 14px;
+  --body-line-height-s: 20px;
+
+  --body-font-size-xs: 12px;
+  --body-line-height-xs: 16px;
+}

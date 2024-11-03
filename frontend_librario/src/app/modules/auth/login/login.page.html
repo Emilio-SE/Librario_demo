@@ -1,0 +1,37 @@
+<ion-content [fullscreen]="true" class="ion-padding">
+
+  <div class="wrapper">
+
+    <h2>¡Bienvenido!</h2>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="content">
+
+      <h1 class="medium-weight">Librario</h1>
+
+      <div class="field">
+        <ion-label class="paragraph-lg medium-weight">Correo electrónico</ion-label>
+        <ion-input type="email" placeholder="Correo electrónico" formControlName="email"></ion-input>
+        <app-form-error [control]="emailControl"></app-form-error>
+      </div>
+
+      <div class="field">
+        <ion-label class="paragraph-lg medium-weight">Contraseña</ion-label>
+        <ion-input type="password" placeholder="Contraseña" formControlName="password"></ion-input>
+        <app-form-error [control]="passwordControl"></app-form-error>
+      </div>
+
+      <ion-button class="paragraph-lg semibold-weight" color="primary" expand="block" type="submit"
+        [disabled]="form.invalid">
+        <ion-icon name="lock-open"></ion-icon>
+        Iniciar sesión
+      </ion-button>
+
+      <span class="paragraph-xs">
+        ¿No tienes cuenta? <a routerLink="/registrar">Crea una cuenta</a>
+      </span>
+
+    </form>
+
+  </div>
+
+</ion-content>

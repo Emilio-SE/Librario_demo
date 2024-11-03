@@ -1,0 +1,39 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title class="title-md header-toolbar">Mi cuenta</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+
+  <div class="wrapper">
+
+    @if (profileData) {
+    <div class="content">
+
+      <div class="info-field">
+        <h2 class="paragraph-md">Nombre</h2>
+        <p class="paragraph-sm">{{ profileData.name }}</p>
+      </div>
+
+      <div class="info-field">
+        <h2 class="paragraph-md">Correo</h2>
+        <p class="paragraph-sm">{{ profileData.email }}</p>
+      </div>
+
+    </div>
+
+    <div class="content">
+      <ion-button expand="block" color="primary" (click)="logout()">Cerrar sesión</ion-button>
+      <ion-button expand="block" color="danger" (click)="deleteAccount()">Eliminar cuenta</ion-button>
+    </div>
+
+    }@else {
+    <div class="content">
+      obteniendo datos...
+    </div>
+    }
+
+  </div>
+
+</ion-content>
