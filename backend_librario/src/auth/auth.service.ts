@@ -26,7 +26,7 @@ export class AuthService {
 
     if (findUser)
       throw new HttpException(
-        'User with this email already exists',
+        'El correo electrónico ya está registrado',
         HttpStatus.BAD_REQUEST,
       );
 
@@ -37,17 +37,18 @@ export class AuthService {
     this.userRepository.save(newUser);
 
     return {
-      message: 'User created successfully',
+      message: 'Usuario creado exitosamente',
       statusCode: 201,
     };
   }
 
   public async login(user: LoginDto): Promise<LoginAuth> {
     const { email, password } = user;
+
     const findUser = await this.userRepository.findOne({ where: { email } });
     if (!findUser)
       throw new HttpException(
-        'Invalid credentials provided',
+        'Credenciales inválidas.',
         HttpStatus.FORBIDDEN,
       );
 
@@ -58,7 +59,7 @@ export class AuthService {
 
     if (!isPasswordMatching)
       throw new HttpException(
-        'Invalid credentials provided',
+        'Credenciales inválidas.',
         HttpStatus.FORBIDDEN,
       );
 

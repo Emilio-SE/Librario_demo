@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { compare } from 'bcrypt';
@@ -32,15 +32,8 @@ export class UserService {
     email: string,
     password: DeleteUserDataDto,
   ): Promise<MessageResponse> {
-
-    const response: MessageResponse = {
-      message: 'Unknown error',
-      statusCode: 400,
-    };
-
     if (!password.password) {
-      response.message = 'Password is required';
-      return response;
+      throw new HttpException('La contraseña es requerida', 400);
     }
 
     const userData: User = await this.userRepository.findOne({
@@ -48,8 +41,7 @@ export class UserService {
     });
 
     if (!userData) {
-      response.message = 'User not found';
-      return response;
+      throw new HttpException('Usuario no encontrado,', 400);
     }
 
     const isPasswordMatching: boolean = await compare(
@@ -58,13 +50,14 @@ export class UserService {
     );
 
     if (!isPasswordMatching) {
-      response.message = 'Incorrect password';
-      return response;
+      throw new HttpException('Contraseña incorrecta', 400);
     }
 
     await this.userRepository.delete(userData.id);
 
-    response.message = 'Account deleted successfully';
-    return response;
+    return {
+      message: 'Usuario eliminado',
+      statusCode: 200,
+    };
   }
 }
