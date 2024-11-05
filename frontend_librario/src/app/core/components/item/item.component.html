@@ -1,0 +1,16 @@
+<div class="item-wrapper" (click)="clicked()">
+  <div class="content">
+    <div class="title paragraph-lg"> {{title}} </div>
+    <div class="subtitle paragraph-md" *ngIf="subtitle"> {{subtitle}} </div>
+  </div>
+  <div class="icon">
+    @switch (serveAs) {
+      @case ('redirect') {
+        <ion-icon name="chevron-forward" class="paragraph-lg"></ion-icon>
+      }
+      @case ('delete') {
+        <ion-icon name="trash" color="danger" class="paragraph-lg"></ion-icon>
+      }
+    }
+  </div>
+</div>

@@ -1,0 +1,29 @@
+.item-wrapper {
+    display: flex;
+    background-color: var(--color-secondary-400);
+    border: 1px solid var(--color-tertiary-200);
+    border-radius: 5px;
+    gap: 16px;
+    padding: 12px 8px;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.title {
+    font-weight: 500;
+}
+
+.subtitle {
+    color: grey;
+}

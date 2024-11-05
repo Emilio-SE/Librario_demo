@@ -21,6 +21,6 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
-  <div class="example-content">{{ contentMap[selectedSegment] }}</div>
-  <!-- <ng-container *ngComponentOutlet="componentMap[selectedSegment]"></ng-container> -->
+  <!-- <div class="example-content">{{ contentMap[selectedSegment] }}</div> -->
+  <ng-container *ngComponentOutlet="contentMap[selectedSegment]"></ng-container>
 </ion-content>

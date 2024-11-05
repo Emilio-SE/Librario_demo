@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { OtherComponent } from '../segments/others/other.component';
 
 @Component({
   selector: 'app-library',
@@ -7,13 +8,13 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LibraryPage implements OnInit {
-  selectedSegment = 'library' as 'library' | 'bookshelf' | 'bookset' | 'other';
+  selectedSegment = 'other' as 'other';
 
   public contentMap = {
-    library: 'Library',
-    bookshelf: 'Bookshelf',
-    bookset: 'Bookset',
-    other: 'Other',
+    //library: 'Library',
+    //bookshelf: 'Bookshelf',
+    //bookset: 'Bookset',
+    other: OtherComponent,
   };
 
   constructor() {}

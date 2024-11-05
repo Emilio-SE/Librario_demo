@@ -7,15 +7,27 @@ const api = 'http://localhost:3000';
 export const environment = {
   production: false,
 
-  // Danger 
+  // --- Danger 
   delete_account: api + '/account/user/delete',
 
-  // Auth
+  // --- Auth
   auth: api + '/auth/login',
   register: api + '/auth/create',
 
-  // Account
+  // --- Account
   account: api + '/account/user/profile',
+
+  // --- Library
+  // Books
+  format: api + '/library/format',
+
+  // Bookshelf
+
+  // Bookset
+
+  // Others
+  category: api + '/library/category',
+  tag: api + '/library/tag',
 
 };
 

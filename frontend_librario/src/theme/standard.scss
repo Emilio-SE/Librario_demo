@@ -45,3 +45,23 @@ ion-tab-button {
   --color: var(--color-tertiary-700);
   --color-selected: var(--color-primary-600);
 }
+
+.spaced-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.no-result {
+  width: 100%;
+  text-align: center;
+  color: grey;
+  font-weight: 500;
+}
+
+.modal-submenu {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 40px 26px;
+}

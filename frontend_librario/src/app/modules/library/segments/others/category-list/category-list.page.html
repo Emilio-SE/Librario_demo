@@ -1,0 +1,35 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start" (click)="closeModal()">
+      <ion-icon name="chevron-back" class="paragraph-lg"></ion-icon>
+    </ion-buttons>
+    <ion-buttons slot="end" id="open-modal">
+      <ion-icon name="ellipsis-vertical" class="paragraph-lg"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="spaced-column">
+    @if (categories.length) {
+    @for (category of categories; track category.id) {
+    <app-item 
+    serveAs="delete" 
+    [title]="category.name" 
+    (onClick)="openDeleteCategory(category.id)">
+    </app-item>
+    }
+    }@else {
+    <div class="no-result paragraph-lg">No hay categorías</div>
+    }
+  </div>
+</ion-content>
+
+<ion-modal trigger="open-modal" [initialBreakpoint]="0.25" [breakpoints]="[0, 0.25]">
+  <ng-template>
+    <div class="modal-submenu">
+      <app-item title="Agregar Categoría" (onClick)="openAddCategory()">
+      </app-item>
+    </div>
+  </ng-template>
+</ion-modal>
