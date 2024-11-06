@@ -15,21 +15,21 @@ import { TagListPage } from './tag-list/tag-list.page';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OtherComponent implements OnInit {
-  public modalController = inject(ModalController);
+  private _modalController = inject(ModalController);
 
   constructor() {}
 
   ngOnInit() {}
 
   public async openCategories(): Promise<void> {
-    const modal = await this.modalController.create({
+    const modal = await this._modalController.create({
       component: CategoryListPage,
     });
     await modal.present();
   }
 
   public async openTags(): Promise<void> {
-    const modal = await this.modalController.create({
+    const modal = await this._modalController.create({
       component: TagListPage,
     });
     await modal.present();

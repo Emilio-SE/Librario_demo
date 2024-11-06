@@ -1,0 +1,40 @@
+<div class="spaced-column">
+  @if (bookList.length) {
+  @for (book of bookList; track book.id) {
+  <app-book-preview
+    [author]="book.author" 
+    [title]="book.title" 
+    [coverUrl]="book.coverUrl || ''" 
+    (onClick)="openBookDetails(book.id)">
+  </app-book-preview>
+  }
+  }@else {
+  <div class="no-result paragraph-lg">No hay libros</div>
+  }
+
+  <ion-modal 
+  [isOpen]="isModalOpen" 
+  [initialBreakpoint]="0.50" 
+  [breakpoints]="[0, 0.50]"
+  (didDismiss)="onModalDismiss()">
+    <ng-template>
+      <div class="modal-submenu">
+        <!-- TODO: ADD SEARCH FUNCTION -->
+        <!-- <div class="item">
+          <ion-input 
+          class="input-styled"
+          type="text" 
+          placeholder="Escriba el autor, título o ISBN"
+          [(ngModel)]="searchTerm">
+          </ion-input>
+
+          <ion-button class="button-styled" (click)="searchBooks()">
+            <ion-icon slot="icon-only" name="search" class="title-md"></ion-icon>
+          </ion-button>
+        </div> -->
+        <app-item title="Agregar nuevo libro manual" (onClick)="openAddManualBook()"></app-item>
+        <app-item title="Agregar nuevo por ISBN" (onClick)="openRequestISBN()"></app-item>
+      </div>
+    </ng-template>
+  </ion-modal>
+</div>

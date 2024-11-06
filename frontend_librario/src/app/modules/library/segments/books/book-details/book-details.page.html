@@ -1,0 +1,89 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start" (click)="closeModal()">
+      <ion-icon name="chevron-back" class="paragraph-lg"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="book-wrapper" *ngIf="bookDetails">
+    <div class="row">
+      <ion-thumbnail class="image-container">
+        <img [src]="bookDetails.coverUrl || ''" alt="cover" class="image-container" />
+      </ion-thumbnail>
+
+      <div class="column">
+        <div class="metadata">
+          <p class="title paragraph-lg"> {{bookDetails.title}} </p>
+          <p class="author paragraph-sm"> {{bookDetails.author}} </p>
+        </div>
+
+        <div class="book-data">
+          <p class="isbn paragraph-sm"> ISBN: {{bookDetails.isbn}} </p>
+          <p class="price paragraph-xm"> ${{bookDetails.price || '0.00'}} </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <p class="label paragraph-md"> Sinopsis </p>
+      <p class="value paragraph-sm"> {{bookDetails.description}} </p>
+    </div>
+
+    <div class="field">
+      <p class="label paragraph-md"> Editorial </p>
+      <p class="value paragraph-sm"> {{bookDetails.publisher}} </p>
+    </div>
+
+    <div class="field">
+      <p class="label paragraph-md"> Edición </p>
+      <p class="value paragraph-sm"> {{bookDetails.edition}} </p>
+    </div>
+
+    <div class="field">
+      <p class="label paragraph-md"> Categorías </p>
+      <p class="value paragraph-sm"> {{bookDetails.genre}} </p>
+    </div>
+
+    <div class="field">
+      <p class="label paragraph-md"> Etiquetas </p>
+      <p class="value paragraph-sm"> {{bookDetails.tag}} </p>
+    </div>
+
+    <div class="field">
+      <p class="label paragraph-md"> Idioma </p>
+      <p class="value paragraph-sm"> {{bookDetails.language}} </p>
+    </div>
+
+    <div class="field">
+      <p class="label paragraph-md"> Número de páginas </p>
+      <p class="value paragraph-sm"> {{bookDetails.pages}} </p>
+    </div>
+
+    <div class="field">
+      <p class="label paragraph-md"> Fecha de publicación </p>
+      <p class="value paragraph-sm"> {{bookDetails.publicationDate}} </p>
+    </div>
+
+    <div class="field">
+      <p class="label paragraph-md"> Fecha de adquisición </p>
+      <p class="value paragraph-sm"> {{bookDetails.acquisitionDate}} </p>
+    </div>
+
+    <div class="field">
+      <p class="label paragraph-md"> Formato </p>
+      <p class="value paragraph-sm"> {{bookDetails.format}} </p>
+    </div>
+
+    <div class="field">
+      <p class="label paragraph-md"> Bookset </p>
+      <p class="value paragraph-sm"> {{bookDetails.booksets }} </p>
+    </div>
+
+    <!-- boton editar con todo el ancho-->
+    <ion-button expand="block" (click)="openEditBook()">Editar</ion-button>
+     
+
+  </div>
+</ion-content>

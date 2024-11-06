@@ -3,6 +3,7 @@
 // The list of file replacements can be found in `angular.json`.
 
 const api = 'http://localhost:3000';
+const openLibraryApi = 'https://openlibrary.org';
 
 export const environment = {
   production: false,
@@ -20,10 +21,15 @@ export const environment = {
   // --- Library
   // Books
   format: api + '/library/format',
-
+  book: api + '/library/book',
+  isbn: api + '/library/book/isbn',
+  
   // Bookshelf
+  bookshelf: api + '/library/bookshelf',
+  shelf: api + '/library/bookshelf/:bookshelf_id/shel',
 
   // Bookset
+  bookset: api + '/library/bookset',
 
   // Others
   category: api + '/library/category',

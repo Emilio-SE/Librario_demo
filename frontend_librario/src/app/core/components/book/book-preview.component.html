@@ -1,0 +1,29 @@
+<div class="book-wrapper" (click)="onClickSelect()">
+  @if (coverUrl) {
+    <img [src]="coverUrl" alt="Portada libro {{title}}">
+  }@else {
+    <div class="no-cover">
+      No image
+    </div>
+  }
+  
+  <div class="metadata">
+    <div class="book-info">
+      <h2 class="paragraph-lg">{{title}}</h2>
+      <p class="paragraph-sm">{{author}}</p>
+    </div>
+    <div class="actions">
+      @switch (type) {
+      @case ('delete') {
+        <ion-icon 
+        name="trash" 
+        color="danger" 
+        slot="icon-only"
+        class="title-lg"
+        (click)="onClickDelete()">
+        </ion-icon>
+      }
+      }
+    </div>
+  </div>
+</div>

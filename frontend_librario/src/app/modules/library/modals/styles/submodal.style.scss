@@ -1,0 +1,17 @@
+.input-styled {
+  background: var(--color-tertiary-50);
+  border: 1px solid var(--color-tertiary-200);
+  padding: 0 10px !important;
+  border-radius: 5px;
+}
+
+.item {
+    display: flex;
+    gap: 9px;
+    align-items: center;
+}
+
+.button-styled {
+    width: 60px;
+    height: 100%;
+}

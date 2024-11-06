@@ -1,5 +1,7 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { OtherComponent } from '../segments/others/other.component';
+import { BooksComponent } from '../segments/books/books/books.component';
+import { LibrarySubmenuCommunicationService } from '../modals/services/library-submenu-communication.service';
 
 @Component({
   selector: 'app-library',
@@ -8,10 +10,12 @@ import { OtherComponent } from '../segments/others/other.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LibraryPage implements OnInit {
-  selectedSegment = 'other' as 'other';
+  selectedSegment = 'library' as 'library' | 'other';
+
+  private _submenuCommSvc = inject(LibrarySubmenuCommunicationService);
 
   public contentMap = {
-    //library: 'Library',
+    library: BooksComponent,
     //bookshelf: 'Bookshelf',
     //bookset: 'Bookset',
     other: OtherComponent,
@@ -20,4 +24,11 @@ export class LibraryPage implements OnInit {
   constructor() {}
 
   ngOnInit() {}
+
+  public openSubmenu(): void {
+    if (this.selectedSegment === 'library') {
+      this._submenuCommSvc.openBookSubmenu();
+    }
+
+  }
 }
