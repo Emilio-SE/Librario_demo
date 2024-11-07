@@ -21,9 +21,14 @@ import { BooksComponent } from '../segments/books/books/books.component';
 import { FillBookPage } from '../segments/books/fill-book/fill-book.page';
 import { BookDetailsPage } from '../segments/books/book-details/book-details.page';
 
+import { BooksetsComponent } from '../segments/booksets/booksets.component';
+import { ManageBooksetsPage } from '../segments/booksets/manage-booksets/manage-booksets.page';
+import { BooksetDetailsPage } from '../segments/booksets/bookset-details/bookset-details.page';
+
 //services for library
 import { BooksService } from '../modals/services/books.service';
 import { OtherService } from '../modals/services/other.service';
+import { BooksetsService } from '../modals/services/booksets.service';
 
 //Pipes
 import { FilterBookListPipe } from '../modals/pipes/filter-book-list.pipe';
@@ -54,8 +59,11 @@ const routes: Routes = [
     FillBookPage,
     BookDetailsPage,
     FilterBookListPipe,
+    BooksetsComponent,
+    ManageBooksetsPage,
+    BooksetDetailsPage,
   ],
   exports: [RouterModule],
-  providers: [OtherService, BooksService],
+  providers: [OtherService, BooksService, BooksetsService],
 })
 export class LibraryPageModule {}

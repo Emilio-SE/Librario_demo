@@ -70,3 +70,10 @@ ion-tab-button {
   display: flex;
   justify-content: center;
 }
+
+.input-styled {
+  background: var(--color-tertiary-50);
+  border: 1px solid var(--color-tertiary-200);
+  padding: 0 10px !important;
+  border-radius: 5px;
+}

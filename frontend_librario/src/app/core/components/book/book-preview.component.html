@@ -23,6 +23,9 @@
         (click)="onClickDelete()">
         </ion-icon>
       }
+      @case ('select') {
+        <ion-checkbox [formControl]="control"></ion-checkbox>
+      }
       }
     </div>
   </div>
