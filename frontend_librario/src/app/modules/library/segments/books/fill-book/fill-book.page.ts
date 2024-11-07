@@ -202,20 +202,22 @@ export class FillBookPage implements OnInit {
     }
   }
 
-  private formatValues(formValue: CreateBook): CreateBook {
+  private formatValues(): CreateBook {
     const values: CreateBook = this.form.getRawValue();
     values.format = values.format ? Number(values.format) : undefined;
     values.tag?.map((tag) => Number(tag));
     values.genre = values.genre?.map((genre) => Number(genre));
     values.price = typeof values.price === 'string' ? Number(values.price) : values.price;
     values.pages = typeof values.pages === 'string' ? Number(values.pages) : values.pages;
+    values.asExpense = values.asExpense ? !!values.asExpense : false;
+    console.log(values);
 
     return values;
   }
 
   public createBook(): void {
     this._bookSvc
-      .createBook(this.formatValues(this.form.getRawValue()))
+      .createBook(this.formatValues())
       .pipe(takeUntilDestroyed(this._destroyedRef))
       .subscribe({
         next: () => {
@@ -241,7 +243,7 @@ export class FillBookPage implements OnInit {
     this._bookSvc
       .updateBook(
         this.bookId.toString(),
-        this.formatValues(this.form.getRawValue())
+        this.formatValues()
       )
       .pipe(takeUntilDestroyed(this._destroyedRef))
       .subscribe({
