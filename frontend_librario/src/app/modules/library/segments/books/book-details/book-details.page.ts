@@ -82,8 +82,12 @@ export class BookDetailsPage implements OnInit {
 
     await modal.present();
 
-    modal.onDidDismiss().then(() => {
-      this.getBookDetails();
+    modal.onDidDismiss().then((data) => {
+      if(data.data?.data){
+        this.closeModal();
+      }else{
+        this.getBookDetails();
+      }
     });
   }
 }

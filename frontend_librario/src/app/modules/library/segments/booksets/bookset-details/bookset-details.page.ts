@@ -6,6 +6,7 @@ import {
   inject,
   Input,
   OnInit,
+  ViewChild,
 } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -45,8 +46,11 @@ export class BooksetDetailsPage implements OnInit {
     this.getBooksetDetails();
   }
 
-  public closeModal() {
-    this._modalController.dismiss();
+  public closeModal(data?: any): void {
+    this._modalController.dismiss({
+      dismissed: true,
+      data,
+    });
   }
 
   public getBooksetDetails(): void {
@@ -72,6 +76,7 @@ export class BooksetDetailsPage implements OnInit {
   }
 
   public async openEditBookset(): Promise<void> {
+    this._cdr.detectChanges();
     const modal = await this._modalController.create({
       component: ManageBooksetsPage,
       componentProps: {
@@ -82,8 +87,14 @@ export class BooksetDetailsPage implements OnInit {
 
     await modal.present();
 
-    modal.onDidDismiss().then(() => {
-      this.getBooksetDetails();
+
+    modal.onDidDismiss().then(async (data) => {
+      if(data.data?.data){
+        await this._modalController.dismiss()
+        this.closeModal();
+      }else{
+        this.getBooksetDetails();
+      }
     });
   }
 }

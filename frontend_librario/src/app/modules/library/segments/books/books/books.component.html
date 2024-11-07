@@ -1,3 +1,7 @@
+<ion-refresher slot="fixed" [pullFactor]="0.5" [pullMin]="50" [pullMax]="100" (ionRefresh)="getBooks($event)">
+  <ion-refresher-content pullingIcon="refresh-outline"></ion-refresher-content>
+</ion-refresher>
+
 <div class="spaced-column">
 
   @if (isLoaded === undefined) {

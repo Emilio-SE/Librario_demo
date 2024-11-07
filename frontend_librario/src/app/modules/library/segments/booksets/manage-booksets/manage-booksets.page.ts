@@ -32,6 +32,7 @@ import { ToastrUtils } from 'src/app/core/utils/Toastr/toastr.utils';
   styleUrls: ['./manage-booksets.page.scss'],
 })
 export class ManageBooksetsPage implements OnInit {
+  
   private _modalController = inject(ModalController);
   private _bookSvc = inject(BooksService);
   private _booksetSvc = inject(BooksetsService);
@@ -75,8 +76,11 @@ export class ManageBooksetsPage implements OnInit {
     return this.form.get(control) as FormControl;
   }
 
-  public closeModal() {
-    this._modalController.dismiss();
+  public closeModal(data?: any): void {
+    this._modalController.dismiss({
+      dismissed: true,
+      data: data
+    });
   }
 
   public getBooksetDetails(): void {
@@ -234,7 +238,7 @@ export class ManageBooksetsPage implements OnInit {
             'success',
             'Bookset eliminado correctamente'
           );
-          this._modalController.dismiss();
+          this.closeModal(true);
         },
         error: (err) => {
           this._taostUtil.emitInfoToast(

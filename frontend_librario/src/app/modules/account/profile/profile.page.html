@@ -6,6 +6,10 @@
 
 <ion-content [fullscreen]="true" class="ion-padding">
 
+  <ion-refresher slot="fixed" [pullFactor]="0.5" [pullMin]="50" [pullMax]="100" (ionRefresh)="getAccount($event)">
+    <ion-refresher-content pullingIcon="refresh-outline"></ion-refresher-content>
+  </ion-refresher>
+
   <div class="wrapper">
 
     @if (profileData) {

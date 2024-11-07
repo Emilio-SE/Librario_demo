@@ -201,8 +201,11 @@ export class FillBookPage implements OnInit {
       });
   }
 
-  public closeModal() {
-    this._modalController.dismiss();
+  public closeModal(data?: any): void {
+    this._modalController.dismiss({
+      dismissed: true,
+      data: data
+    });
   }
 
   public saveBook(): void {
@@ -221,7 +224,6 @@ export class FillBookPage implements OnInit {
     values.price = typeof values.price === 'string' ? Number(values.price) : values.price;
     values.pages = typeof values.pages === 'string' ? Number(values.pages) : values.pages;
     values.asExpense = values.asExpense ? !!values.asExpense : false;
-    console.log(values);
 
     return values;
   }
@@ -295,7 +297,7 @@ export class FillBookPage implements OnInit {
             'success',
             'Libro eliminado con éxito'
           );
-          this.closeModal();
+          this.closeModal(true);
         },
         error: (error) => {
           this._toastrUtil.emitInfoToast(

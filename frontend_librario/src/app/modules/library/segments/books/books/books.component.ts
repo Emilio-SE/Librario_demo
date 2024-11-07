@@ -41,7 +41,7 @@ export class BooksComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
-    this.getBooks();
+    this.getBooks(null);
     this.openSubmenu();
   }
 
@@ -56,7 +56,7 @@ export class BooksComponent implements OnInit {
       });
   }
 
-  private getBooks(): void {
+  public getBooks(event: any): void {
     this.isLoaded = undefined;
     this._bookSvc
       .getBooks()
@@ -65,6 +65,7 @@ export class BooksComponent implements OnInit {
         next: (data) => {
           this.bookList = data;
           this.isLoaded = true;
+          if (event) event.target.complete();
           this._cdr.detectChanges();
         },
         error: (error) => {
@@ -92,7 +93,7 @@ export class BooksComponent implements OnInit {
     await modal.present();
 
     modal.onDidDismiss().then(() => {
-      this.getBooks();
+      this.getBooks(null);
     });
   }
 
@@ -110,7 +111,7 @@ export class BooksComponent implements OnInit {
     await modal.present();
 
     modal.onDidDismiss().then(() => {
-      this.getBooks();
+      this.getBooks(null);
     });
   }
 
@@ -148,7 +149,7 @@ export class BooksComponent implements OnInit {
     await modal.present();
 
     modal.onDidDismiss().then(() => {
-      this.getBooks();
+      this.getBooks(null);
     });
   }
 }

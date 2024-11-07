@@ -56,12 +56,17 @@ export class ProfilePage implements OnInit {
   constructor() {}
 
   ngOnInit() {
+    this.getAccount();
+  }
+
+  public getAccount(event?: any) {
     this._accountSvc
       .getProfile()
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe({
         next: (data) => {
           this.profileData = data;
+          if(event) event.target.complete();
           this._cdr.detectChanges();
         },
         error: (error) => {
