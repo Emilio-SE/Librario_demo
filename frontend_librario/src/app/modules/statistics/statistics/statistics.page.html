@@ -1,11 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title class="title-md">Mis lecturas</ion-title>
-    <ion-buttons slot="primary">
-      <ion-button>
-        <ion-icon slot="icon-only" ios="ellipsis-vertical" md="ellipsis-vertical" class="icon-button"></ion-icon>
-      </ion-button>
-    </ion-buttons>
+    <ion-title class="title-md">Estadísticas</ion-title>
   </ion-toolbar>
   <ion-toolbar>
     <ion-segment [scrollable]="true" [(ngModel)]="selectedSegment">
@@ -20,6 +15,12 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
-  <div>{{ contentMap[selectedSegment] }}</div>
-  <!-- <ng-container *ngComponentOutlet="componentMap[selectedSegment]"></ng-container> -->
+
+  <app-books-statistics [ngClass]="{
+    'hidden': selectedSegment !== 'books'
+  }"></app-books-statistics>
+  <app-finance-statistics [ngClass]="{
+    'hidden': selectedSegment !== 'expenses'
+  }"></app-finance-statistics>
+
 </ion-content>

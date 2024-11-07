@@ -35,6 +35,13 @@ export const environment = {
   category: api + '/library/category',
   tag: api + '/library/tag',
 
+  // --- Readings
+
+
+  // --- Statistics
+  booksStatistics: api + '/statistics/books',
+  moneyStatistics: api + '/statistics/money',
+
 };
 
 /*

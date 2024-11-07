@@ -1,0 +1,27 @@
+<ion-refresher slot="fixed" [pullFactor]="0.5" [pullMin]="50" [pullMax]="100" (ionRefresh)="getData($event)">
+  <ion-refresher-content pullingIcon="refresh-outline"></ion-refresher-content>
+</ion-refresher>
+
+@if (isLoaded === undefined) {
+<div class="spinner-container">
+  <ion-spinner name="crescent" color="primary"></ion-spinner>
+</div>
+}@else if (isLoaded === false) {
+<div class="no-result paragraph-lg">Error al cargar la información</div>
+}@else {
+
+<div class="spaced-column">
+
+  <div class="results">
+    <h2 class="paragraph-lg" >Libros leídos en el mes</h2>
+
+    @for (month of statistics; track month.month) {
+    <p class="paragraph-md" >{{ getMonthName(month.month) }}: {{month.count}}</p>
+    }
+    <p>Total: {{ totalBooks }}</p>
+  </div>
+
+  <div id="moneyChart" class="chart"></div>
+
+</div>
+}

@@ -1,4 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { BooksStatisticsComponent } from '../segments/books-statistics/books-statistics.component';
+import { FinanceStatisticsComponent } from '../segments/finance-statistics/finance-statistics.component';
 
 @Component({
   selector: 'app-statistics',
@@ -8,11 +10,6 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 })
 export class StatisticsPage implements OnInit {
   selectedSegment = 'books' as 'books' | 'expenses';
-
-  public contentMap = {
-    books: 'books',
-    expenses: 'expenses',
-  };
 
   constructor() {}
 
