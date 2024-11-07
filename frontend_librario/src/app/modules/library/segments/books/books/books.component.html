@@ -1,6 +1,6 @@
 <div class="spaced-column">
   @if (bookList.length) {
-  @for (book of bookList; track book.id) {
+  @for (book of (bookList | filterBookList: searchTerm); track book.id) {
   <app-book-preview
     [author]="book.author" 
     [title]="book.title" 
@@ -19,19 +19,14 @@
   (didDismiss)="onModalDismiss()">
     <ng-template>
       <div class="modal-submenu">
-        <!-- TODO: ADD SEARCH FUNCTION -->
-        <!-- <div class="item">
+        <div class="item">
           <ion-input 
           class="input-styled"
           type="text" 
-          placeholder="Escriba el autor, título o ISBN"
+          placeholder="Escriba el autor o título"
           [(ngModel)]="searchTerm">
           </ion-input>
-
-          <ion-button class="button-styled" (click)="searchBooks()">
-            <ion-icon slot="icon-only" name="search" class="title-md"></ion-icon>
-          </ion-button>
-        </div> -->
+        </div>
         <app-item title="Agregar nuevo libro manual" (onClick)="openAddManualBook()"></app-item>
         <app-item title="Agregar nuevo por ISBN" (onClick)="openRequestISBN()"></app-item>
       </div>

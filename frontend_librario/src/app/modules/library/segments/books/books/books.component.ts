@@ -84,6 +84,10 @@ export class BooksComponent implements OnInit {
     });
 
     await modal.present();
+
+    modal.onDidDismiss().then(() => {
+      this.getBooks();
+    });
   }
 
   public searchBooks(): void {
@@ -98,6 +102,10 @@ export class BooksComponent implements OnInit {
     });
 
     await modal.present();
+
+    modal.onDidDismiss().then(() => {
+      this.getBooks();
+    });
   }
 
   public async openRequestISBN(): Promise<void> {
@@ -132,5 +140,9 @@ export class BooksComponent implements OnInit {
     });
 
     await modal.present();
+
+    modal.onDidDismiss().then(() => {
+      this.getBooks();
+    });
   }
 }

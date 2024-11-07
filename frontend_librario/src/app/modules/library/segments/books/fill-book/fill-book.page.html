@@ -7,7 +7,7 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form [formGroup]="form" *ngIf="bookId > 0">
+  <form [formGroup]="form" *ngIf="!isEdition || (isEdition && bookId > 0)">
 
     <ion-list>
       <div class="row">
@@ -51,7 +51,7 @@
         <ion-label position="stacked" class="paragraph-lg">Categorías</ion-label>
         <ion-select formControlName="genre" multiple="true" placeholder="Selecciona">
           @for (category of categories; track category.id) {
-          <ion-select-option value="{{ category.id }}">{{ category.name }}</ion-select-option>
+          <ion-select-option [value]="category.id">{{ category.name }}</ion-select-option>
           }
         </ion-select>
       </ion-item>
@@ -59,7 +59,7 @@
         <ion-label position="stacked" class="paragraph-lg">Etiquetas</ion-label>
         <ion-select formControlName="tag" multiple="true" placeholder="Selecciona">
           @for (tag of tags; track tag.id) {
-          <ion-select-option value="{{ tag.id }}">{{ tag.name }}</ion-select-option>
+          <ion-select-option [value]="tag.id">{{ tag.name }}</ion-select-option>
           }
         </ion-select>
       </ion-item>
@@ -84,7 +84,7 @@
         <ion-select formControlName="format" placeholder="Selecciona">
           <ion-select-option [value]="undefined">Sin formato</ion-select-option>
           @for (format of formats; track format.id) {
-          <ion-select-option value="{{ format.id }}">{{ format.name }}</ion-select-option>
+          <ion-select-option [value]="format.id">{{ format.name }}</ion-select-option>
           }
         </ion-select>
 
@@ -105,7 +105,7 @@
 
     <ion-row class="ion-padding-top">
       <ion-col size="6" *ngIf="isEdition">
-        <ion-button (click)="deleteBook()" color="danger" expand="block">Eliminar</ion-button>
+        <ion-button (click)="requestDeleteBook()" color="danger" expand="block">Eliminar</ion-button>
       </ion-col>
       <ion-col [size]="isEdition ? '6' : '12'">
         <ion-button (click)="saveBook()" [disabled]="!form.valid" color="primary" expand="block">Guardar</ion-button>

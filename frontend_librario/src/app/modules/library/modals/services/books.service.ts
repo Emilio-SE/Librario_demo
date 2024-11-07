@@ -71,7 +71,7 @@ export class BooksService {
             ? new Date(data.acquisitionDate).toISOString().split('T')[0]
             : '',
           coverUrl: data.coverUrl,
-          format: data.formatId,
+          format: data.format,
           genre: data.genres,
           tag: data.tags,
           asExpense: data.asExpense,

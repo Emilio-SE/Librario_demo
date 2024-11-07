@@ -25,6 +25,9 @@ import { BookDetailsPage } from '../segments/books/book-details/book-details.pag
 import { BooksService } from '../modals/services/books.service';
 import { OtherService } from '../modals/services/other.service';
 
+//Pipes
+import { FilterBookListPipe } from '../modals/pipes/filter-book-list.pipe';
+
 const routes: Routes = [
   {
     path: '',
@@ -50,6 +53,7 @@ const routes: Routes = [
     TagListPage,
     FillBookPage,
     BookDetailsPage,
+    FilterBookListPipe,
   ],
   exports: [RouterModule],
   providers: [OtherService, BooksService],

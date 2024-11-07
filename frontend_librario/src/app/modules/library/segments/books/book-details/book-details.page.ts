@@ -43,7 +43,6 @@ export class BookDetailsPage implements OnInit {
   }
 
   private getBookDetails(): void {
-    //FIXME: GET BOOK DETAILS ARRAY VALUES
     if (this.bookId !== -1) {
       this._bookSvc
         .getBook(this.bookId.toString())
@@ -51,7 +50,6 @@ export class BookDetailsPage implements OnInit {
         .subscribe({
           next: (data) => {
             this.bookDetails = data;
-            console.log(this.bookDetails);
             this._cdr.detectChanges();
           },
           error: (err) => {
@@ -75,5 +73,9 @@ export class BookDetailsPage implements OnInit {
     });
 
     await modal.present();
+
+    modal.onDidDismiss().then(() => {
+      this.getBookDetails();
+    });
   }
 }

@@ -28,57 +28,78 @@
 
     <div class="field">
       <p class="label paragraph-md"> Sinopsis </p>
-      <p class="value paragraph-sm"> {{bookDetails.description}} </p>
+      <p class="value paragraph-sm"> {{bookDetails.description || '-----'}} </p>
     </div>
 
     <div class="field">
       <p class="label paragraph-md"> Editorial </p>
-      <p class="value paragraph-sm"> {{bookDetails.publisher}} </p>
+      <p class="value paragraph-sm"> {{bookDetails.publisher || '-----'}} </p>
     </div>
 
     <div class="field">
       <p class="label paragraph-md"> Edición </p>
-      <p class="value paragraph-sm"> {{bookDetails.edition}} </p>
+      <p class="value paragraph-sm"> {{bookDetails.edition || '-----'}} </p>
     </div>
 
     <div class="field">
       <p class="label paragraph-md"> Categorías </p>
-      <p class="value paragraph-sm"> {{bookDetails.genre}} </p>
+      <p class="value paragraph-sm"> 
+        @if(bookDetails.genre.length === 0) {
+          -----
+        }
+        @for (genre of bookDetails.genre; track $index) {
+          {{ genre.name }}{{ $last ? '' : ', ' }}
+        }  
+      </p>
     </div>
 
     <div class="field">
       <p class="label paragraph-md"> Etiquetas </p>
-      <p class="value paragraph-sm"> {{bookDetails.tag}} </p>
+      <p class="value paragraph-sm"> 
+        @if(bookDetails.tag.length === 0) {
+          -----
+        }
+        @for (tag of bookDetails.tag; track $index) {
+          {{ tag.name }}{{ $last ? '' : ', ' }}
+        }  
+      </p>
     </div>
 
     <div class="field">
       <p class="label paragraph-md"> Idioma </p>
-      <p class="value paragraph-sm"> {{bookDetails.language}} </p>
+      <p class="value paragraph-sm"> {{bookDetails.language || '-----'}} </p>
     </div>
 
     <div class="field">
       <p class="label paragraph-md"> Número de páginas </p>
-      <p class="value paragraph-sm"> {{bookDetails.pages}} </p>
+      <p class="value paragraph-sm"> {{bookDetails.pages || '-----'}} </p>
     </div>
 
     <div class="field">
       <p class="label paragraph-md"> Fecha de publicación </p>
-      <p class="value paragraph-sm"> {{bookDetails.publicationDate}} </p>
+      <p class="value paragraph-sm"> {{bookDetails.publicationDate || '-----'}} </p>
     </div>
 
     <div class="field">
       <p class="label paragraph-md"> Fecha de adquisición </p>
-      <p class="value paragraph-sm"> {{bookDetails.acquisitionDate}} </p>
+      <p class="value paragraph-sm"> {{bookDetails.acquisitionDate || '-----'}} </p>
     </div>
 
     <div class="field">
       <p class="label paragraph-md"> Formato </p>
-      <p class="value paragraph-sm"> {{bookDetails.format}} </p>
+      <p class="value paragraph-sm"> {{bookDetails.format?.name || '-----'}} </p>
     </div>
 
     <div class="field">
       <p class="label paragraph-md"> Bookset </p>
-      <p class="value paragraph-sm"> {{bookDetails.booksets }} </p>
+      <p class="value paragraph-sm"> 
+        @if(bookDetails.booksets.length === 0) {
+          -----
+        }
+        @for (bookset of bookDetails.booksets; track $index) {
+          {{ bookset.name }}{{ $last ? '' : ', ' }}
+        }  
+      </p>
     </div>
 
     <!-- boton editar con todo el ancho-->

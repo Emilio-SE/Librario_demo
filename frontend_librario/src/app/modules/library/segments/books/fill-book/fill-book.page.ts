@@ -10,7 +10,12 @@ import {
 import { ModalController } from '@ionic/angular';
 import { BooksService } from '../../../modals/services/books.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import {
   CreateBook,
   Format,
@@ -109,8 +114,13 @@ export class FillBookPage implements OnInit {
       .pipe(takeUntilDestroyed(this._destroyedRef))
       .subscribe({
         next: (book) => {
-          this.form.patchValue(book);
           this.bookId = book.id;
+          this.form.patchValue(book);
+          this.getControl('format').setValue(book.format?.id);
+          this.getControl('genre').setValue(
+            book.genre?.map((genre) => genre.id)
+          );
+          this.getControl('tag').setValue(book.tag?.map((tag) => tag.id));
           this._cdr.detectChanges();
         },
         error: (error) => {
@@ -192,14 +202,20 @@ export class FillBookPage implements OnInit {
     }
   }
 
-  public createBook(): void {
+  private formatValues(formValue: CreateBook): CreateBook {
     const values: CreateBook = this.form.getRawValue();
     values.format = values.format ? Number(values.format) : undefined;
     values.tag?.map((tag) => Number(tag));
     values.genre = values.genre?.map((genre) => Number(genre));
+    values.price = typeof values.price === 'string' ? Number(values.price) : values.price;
+    values.pages = typeof values.pages === 'string' ? Number(values.pages) : values.pages;
 
+    return values;
+  }
+
+  public createBook(): void {
     this._bookSvc
-      .createBook(values)
+      .createBook(this.formatValues(this.form.getRawValue()))
       .pipe(takeUntilDestroyed(this._destroyedRef))
       .subscribe({
         next: () => {
@@ -217,15 +233,16 @@ export class FillBookPage implements OnInit {
       });
   }
 
-  public updateBook(): void {
-    const values: UpdateBook = this.form.getRawValue();
-    values.format = values.format ? Number(values.format) : undefined;
-    values.tag = values.tag?.map((tag) => Number(tag));
-    values.genre = values.genre?.map((genre) => Number(genre));
-    console.log(values);
+  public getControl(from: string): FormControl {
+    return this.form.get(from) as FormControl;
+  }
 
+  public updateBook(): void {
     this._bookSvc
-      .updateBook(this.bookId.toString(), values)
+      .updateBook(
+        this.bookId.toString(),
+        this.formatValues(this.form.getRawValue())
+      )
       .pipe(takeUntilDestroyed(this._destroyedRef))
       .subscribe({
         next: () => {
@@ -246,7 +263,16 @@ export class FillBookPage implements OnInit {
       });
   }
 
-  public deleteBook(): void {
+  public requestDeleteBook(): void {
+    this._toastrUtil.deleteAlert(
+      'Eliminar libro',
+      '¿Estás seguro que deseas eliminar el libro?',
+      () => this.deleteBook(),
+      undefined
+    )
+  }
+
+  private deleteBook(): void {
     this._bookSvc
       .deleteBook(this.isbn)
       .pipe(takeUntilDestroyed(this._destroyedRef))

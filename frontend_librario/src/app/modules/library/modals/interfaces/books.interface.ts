@@ -10,19 +10,19 @@ export interface BookDetails {
   pages?: number;
   publicationDate?: string;
   acquisitionDate?: string;
-  format?: number;
+  format?: ItemDetails;
   price?: number;
   asExpense?: boolean;
   coverUrl?: string;
-  genre: number[];
-  tag: number[];
-  booksets: number[];
+  genre: ItemDetails[];
+  tag: ItemDetails[];
+  booksets: ItemDetails[];
   bookshelfShelves: Shelves[];
 }
 
 export interface Shelves {
-  bookshelfId: number;
-  shelves: number[];
+  bookshelfId: ItemDetails;
+  shelves: ItemDetails[];
 }
 
 export interface BookPreview {
@@ -73,6 +73,11 @@ export interface UpdateBook {
 }
 
 export interface Format {
+  id: number;
+  name: string;
+}
+
+export interface ItemDetails {
   id: number;
   name: string;
 }
