@@ -34,6 +34,8 @@ export class BooksComponent implements OnInit {
   private toastrUtils = new ToastrUtils();
   public isModalOpen = false;
 
+  public isLoaded: boolean | undefined;
+
   public searchTerm = '';
 
   constructor() {}
@@ -55,16 +57,20 @@ export class BooksComponent implements OnInit {
   }
 
   private getBooks(): void {
+    this.isLoaded = undefined;
     this._bookSvc
       .getBooks()
       .pipe(takeUntilDestroyed(this._destroyedRef))
       .subscribe({
         next: (data) => {
           this.bookList = data;
+          this.isLoaded = true;
           this._cdr.detectChanges();
         },
         error: (error) => {
           this.toastrUtils.emitInfoToast('danger', error.error.message);
+          this.isLoaded = false;
+          this._cdr.detectChanges();
         },
       });
   }

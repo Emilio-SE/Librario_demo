@@ -1,15 +1,27 @@
 <div class="spaced-column">
-  @if (bookList.length) {
-  @for (book of (bookList | filterBookList: searchTerm); track book.id) {
-  <app-book-preview
-    [author]="book.author" 
-    [title]="book.title" 
-    [coverUrl]="book.coverUrl || ''" 
-    (onClick)="openBookDetails(book.id)">
-  </app-book-preview>
-  }
+
+  @if (isLoaded === undefined) {
+  <div class="spinner-container">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+  </div>
+  }@else if (isLoaded === false) {
+  <div class="no-result paragraph-lg">Error al cargar la información</div>
   }@else {
-  <div class="no-result paragraph-lg">No hay libros</div>
+
+  <ng-container *ngIf="(bookList | filterBookList: searchTerm) as books">
+    @for (book of books; track book.id) {
+    <app-book-preview
+      [author]="book.author" 
+      [title]="book.title" 
+      [coverUrl]="book.coverUrl || ''" 
+      (onClick)="openBookDetails(book.id)">
+    </app-book-preview>
+    }
+
+    @if (books.length === 0) {
+    <div class="no-result paragraph-lg">No hay libros</div>
+    }
+  </ng-container>
   }
 
   <ion-modal 

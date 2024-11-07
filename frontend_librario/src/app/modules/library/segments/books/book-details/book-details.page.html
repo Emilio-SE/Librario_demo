@@ -7,7 +7,16 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <div class="book-wrapper" *ngIf="bookDetails">
+
+  @if (isLoaded === undefined) {
+  <div class="spinner-container">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+  </div>
+  }@else if (isLoaded === false) {
+  <div class="paragraph-lg">Error al cargar la información</div>
+  }
+
+  <div class="book-wrapper" *ngIf="bookDetails && isLoaded">
     <div class="row">
       <ion-thumbnail class="image-container">
         <img [src]="bookDetails.coverUrl || ''" alt="cover" class="image-container" />

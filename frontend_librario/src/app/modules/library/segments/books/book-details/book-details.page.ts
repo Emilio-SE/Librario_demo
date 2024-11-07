@@ -28,6 +28,7 @@ export class BookDetailsPage implements OnInit {
 
   private toastrUtils = new ToastrUtils();
 
+  public isLoaded: boolean | undefined;
   public bookDetails: BookDetails | undefined;
 
   @Input() bookId: number = -1;
@@ -43,6 +44,7 @@ export class BookDetailsPage implements OnInit {
   }
 
   private getBookDetails(): void {
+    this.isLoaded = undefined;
     if (this.bookId !== -1) {
       this._bookSvc
         .getBook(this.bookId.toString())
@@ -50,6 +52,7 @@ export class BookDetailsPage implements OnInit {
         .subscribe({
           next: (data) => {
             this.bookDetails = data;
+            this.isLoaded = true;
             this._cdr.detectChanges();
           },
           error: (err) => {
@@ -57,10 +60,15 @@ export class BookDetailsPage implements OnInit {
               'Error',
               'Error al obtener los detalles del libro ' + err.error.message
             );
+            this.isLoaded = false;
             this._cdr.detectChanges();
           },
         });
+    }else{
+      this.isLoaded = false;
+      this._cdr.detectChanges();
     }
+
   }
 
   public async openEditBook(): Promise<void> {

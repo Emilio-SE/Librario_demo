@@ -49,6 +49,8 @@ export class FillBookPage implements OnInit {
   public categories: Category[] = [];
   public tags: Tag[] = [];
 
+  public isLoaded: boolean | undefined;
+
   public form: FormGroup;
 
   constructor() {
@@ -86,16 +88,21 @@ export class FillBookPage implements OnInit {
       this.getBookDetailsInDatabase();
     } else if (!this.isEdition && this.isbn) {
       this.getBookDetailsByOpenLibrary();
+    }else{
+      this.isLoaded = true;
+      this._cdr.detectChanges();
     }
   }
 
   private getBookDetailsByOpenLibrary(): void {
+    this.isLoaded = undefined;
     this._bookSvc
       .getBookDetailsByISBN(this.isbn)
       .pipe(takeUntilDestroyed(this._destroyedRef))
       .subscribe({
         next: (book) => {
           this.form.patchValue(book);
+          this.isLoaded = true;
           this._cdr.detectChanges();
         },
         error: (error) => {
@@ -103,12 +110,14 @@ export class FillBookPage implements OnInit {
             'danger',
             'Error al obtener los detalles del libro, es posible que no exista en la base de datos'
           );
+          this.isLoaded = false;
           this._cdr.detectChanges();
         },
       });
   }
 
   private getBookDetailsInDatabase(): void {
+    this.isLoaded = undefined;
     this._bookSvc
       .getBook(this.isbn)
       .pipe(takeUntilDestroyed(this._destroyedRef))
@@ -121,6 +130,7 @@ export class FillBookPage implements OnInit {
             book.genre?.map((genre) => genre.id)
           );
           this.getControl('tag').setValue(book.tag?.map((tag) => tag.id));
+          this.isLoaded = true;
           this._cdr.detectChanges();
         },
         error: (error) => {
@@ -128,6 +138,7 @@ export class FillBookPage implements OnInit {
             'danger',
             'Error al obtener los detalles del libro: ' + error.error.message
           );
+          this.isLoaded = false;
           this._cdr.detectChanges();
         },
       });

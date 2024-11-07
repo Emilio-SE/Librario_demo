@@ -7,7 +7,16 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form [formGroup]="form" *ngIf="!isEdition || (isEdition && bookId > 0)">
+
+  @if (isLoaded === undefined) {
+  <div class="spinner-container">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+  </div>
+  }@else if (isLoaded === false) {
+  <div class="paragraph-lg">Error al cargar la información</div>
+  }
+
+  <form [formGroup]="form" *ngIf="isLoaded">
 
     <ion-list>
       <div class="row">
