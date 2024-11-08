@@ -21,6 +21,11 @@ import { BooksComponent } from '../segments/books/books/books.component';
 import { FillBookPage } from '../segments/books/fill-book/fill-book.page';
 import { BookDetailsPage } from '../segments/books/book-details/book-details.page';
 
+import { BookshelfComponent } from '../segments/bookshelves/bookshelf.component';
+import { BookshelfDetailsPage } from '../segments/bookshelves/bookshelf-details/bookshelf-details.page';
+import { ShelfDetailsPage } from '../segments/bookshelves/shelf-details/shelf-details.page';
+import { ManageShelfPage } from '../segments/bookshelves/manage-shelf/manage-shelf.page';
+
 import { BooksetsComponent } from '../segments/booksets/booksets.component';
 import { ManageBooksetsPage } from '../segments/booksets/manage-booksets/manage-booksets.page';
 import { BooksetDetailsPage } from '../segments/booksets/bookset-details/bookset-details.page';
@@ -59,6 +64,10 @@ const routes: Routes = [
     FillBookPage,
     BookDetailsPage,
     FilterBookListPipe,
+    BookshelfComponent,
+    BookshelfDetailsPage,
+    ShelfDetailsPage,
+    ManageShelfPage,
     BooksetsComponent,
     ManageBooksetsPage,
     BooksetDetailsPage,

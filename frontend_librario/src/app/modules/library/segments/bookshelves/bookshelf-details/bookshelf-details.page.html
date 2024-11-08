@@ -1,0 +1,49 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start" (click)="closeModal()">
+      <ion-icon name="chevron-back" class="paragraph-lg"></ion-icon>
+    </ion-buttons>
+    <ion-buttons slot="end" id="open-modal">
+      <ion-icon name="ellipsis-vertical" class="paragraph-lg"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="spaced-column">
+    @if (isLoaded) {
+
+      @for (shelf of shelves; track shelf.id) {
+        <app-item
+        [title]="shelf.name"
+        [subtitle]="shelf.bookQuantity.toString()"
+        (onClick)="openShelfDetails(shelf.id)">
+        </app-item>
+      }
+  
+      @if (shelves.length === 0) {
+        <div class="no-result paragraph-lg">No hay estantes</div>
+      }
+  
+    }@else if (isLoaded === undefined) {
+      <div class="spinner-container">
+        <ion-spinner name="crescent" color="primary"></ion-spinner>
+      </div>
+    }@else {
+      <div class="no-result paragraph-lg">Error al cargar la información</div>
+    }
+  </div>
+</ion-content>
+
+<ion-modal 
+trigger="open-modal"
+[initialBreakpoint]="0.50" 
+[breakpoints]="[0, 0.50]">
+  <ng-template>
+    <div class="modal-submenu">
+      <app-item title="Agregar nuevo estante" (onClick)="openAddNewShelf()"></app-item>
+      <app-item title="Cambiar nombre del librero" (onClick)="openEditBookshelf()"></app-item>
+      <app-item title="Eliminar librero" (onClick)="openDeleteBookshelf()"></app-item>
+    </div>
+  </ng-template>
+</ion-modal>

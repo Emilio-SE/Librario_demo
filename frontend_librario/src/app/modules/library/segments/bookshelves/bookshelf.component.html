@@ -1,0 +1,41 @@
+<ion-refresher slot="fixed" [pullFactor]="0.5" [pullMin]="50" [pullMax]="100" (ionRefresh)="getBookshelves($event)">
+  <ion-refresher-content pullingIcon="refresh-outline"></ion-refresher-content>
+</ion-refresher>
+
+<div class="spaced-column">
+  
+  @if (isLoaded) {
+
+    @for (bookshelf of bookshelves; track bookshelf.id) {
+      <app-item
+      [title]="bookshelf.name"
+      [subtitle]="bookshelf.shelfQuantity.toString()"
+      (onClick)="openBookshelfDetails(bookshelf.id)">
+      </app-item>
+    }
+
+    @if (bookshelves.length === 0) {
+      <div class="no-result paragraph-lg">No hay libreros</div>
+    }
+
+  }@else if (isLoaded === undefined) {
+    <div class="spinner-container">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+    </div>
+  }@else {
+    <div class="no-result paragraph-lg">Error al cargar la información</div>
+  }
+
+</div>
+
+<ion-modal 
+[isOpen]="isModalOpen" 
+[initialBreakpoint]="0.25" 
+[breakpoints]="[0, 0.25]"
+(didDismiss)="onModalDismiss()">
+  <ng-template>
+    <div class="modal-submenu">
+      <app-item title="Agregar nuevo librero" (onClick)="openAddNewBookshelf()"></app-item>
+    </div>
+  </ng-template>
+</ion-modal>

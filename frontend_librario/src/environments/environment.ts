@@ -8,7 +8,7 @@ const openLibraryApi = 'https://openlibrary.org';
 export const environment = {
   production: false,
 
-  // --- Danger 
+  // --- Danger
   delete_account: api + '/account/user/delete',
 
   // --- Auth
@@ -23,10 +23,10 @@ export const environment = {
   format: api + '/library/format',
   book: api + '/library/book',
   isbn: api + '/library/book/isbn',
-  
+
   // Bookshelf
   bookshelf: api + '/library/bookshelf',
-  shelf: api + '/library/bookshelf/:bookshelf_id/shel',
+  shelf: api + '/library/bookshelf/:bookshelf_id/shelf',
 
   // Bookset
   bookset: api + '/library/bookset',
@@ -37,11 +37,9 @@ export const environment = {
 
   // --- Readings
 
-
   // --- Statistics
   booksStatistics: api + '/statistics/books',
   moneyStatistics: api + '/statistics/money',
-
 };
 
 /*

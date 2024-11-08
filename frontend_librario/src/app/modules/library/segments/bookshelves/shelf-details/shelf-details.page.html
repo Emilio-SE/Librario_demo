@@ -1,0 +1,46 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start" (click)="closeModal()">
+      <ion-icon name="chevron-back" class="paragraph-lg"></ion-icon>
+    </ion-buttons>
+    <ion-buttons slot="end" id="open-submodal">
+      <ion-icon name="ellipsis-vertical" class="paragraph-lg"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div class="spaced-column">
+    @if(isShelfLoaded) {
+    @for (book of shelfDetails?.books; track $index) {
+      <app-book-preview
+        [author]="book.author"
+        [title]="book.title"
+        [coverUrl]="book.cover || ''">
+      </app-book-preview>
+    }
+
+    @if (shelfDetails?.books?.length === 0) {
+    <div class="no-result paragraph-lg">No hay libros</div>
+    }
+    }@else if (isShelfLoaded === undefined) {
+    <div class="spinner-container">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+    </div>
+    }@else {
+    <div class="no-result paragraph-lg">Error al cargar la información</div>
+    }
+
+  </div>
+
+  <ion-modal trigger="open-submodal" [initialBreakpoint]="0.25" [breakpoints]="[0, 0.25]">
+    <ng-template>
+      <div class="modal-submenu">
+        <app-item title="Editar estante" (onClick)="openEditShelf()">
+        </app-item>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+</ion-content>
