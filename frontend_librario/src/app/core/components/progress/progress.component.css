@@ -1,0 +1,74 @@
+ion-progress-bar {
+    height: 16px;
+    margin-right: 8px;
+    border: 1px solid var(--color-primary-500);
+    --background: white;
+}
+
+ion-item {
+    --padding-start: 0;
+    --padding-end: 0;
+    --inner-padding-end: 0;
+    --inner-padding-start: ;
+    --inner-border-width: 0;
+    --background: var(--color-secondary-400);
+    --min-height: none;
+}
+
+.title {
+    display: flex;
+    justify-content: space-between;
+}
+
+.book-wrapper {
+    display: flex;
+    flex-direction: row;
+    padding: 8px;
+    gap: 16px;
+    background-color: var(--color-secondary-400);
+    border: 1px solid var(--color-tertiary-200);
+    border-radius: 5px;
+}
+
+img, .no-cover {
+    width: 80px;
+    height: 120px;
+}
+
+.no-cover {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    border: 1px solid var(--color-tertiary-200);
+    background-color: var(--color-tertiary-100);
+}
+
+.metadata {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    gap: 8px;
+}
+
+.book-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.book-info > p {
+    color: grey;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.progress {
+    display: flex;
+    gap: 8px;
+}

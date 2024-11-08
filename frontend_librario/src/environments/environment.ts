@@ -36,6 +36,8 @@ export const environment = {
   tag: api + '/library/tag',
 
   // --- Readings
+  reading: api + '/reading/readings',
+  goals: api + '/reading/goals',
 
   // --- Statistics
   booksStatistics: api + '/statistics/books',

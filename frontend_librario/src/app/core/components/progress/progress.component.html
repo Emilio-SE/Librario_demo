@@ -1,0 +1,32 @@
+<div class="book-wrapper" (click)="onClickSelect()">
+  @if (coverUrl && type === 'book') {
+  <img [src]="coverUrl" alt="Portada libro {{title}}">
+  }@else if (!coverUrl && type === 'book') {
+  <div class="no-cover">
+    No cover
+  </div>
+  }
+
+  <div class="metadata">
+    <div class="book-info">
+      <div class="title">
+        <h2 class="paragraph-lg">{{title}}</h2>
+        @if (type === 'goal') {
+          <ion-icon  ios="ellipsis-vertical" md="ellipsis-vertical" class="paragraph-lg"></ion-icon>
+        }
+      </div>
+      @if (author) {
+      <p class="paragraph-sm">{{author}}</p>
+      }@else {
+      <p class="paragraph-sm">{{initDate}} - {{endDate}}</p>
+      }
+    </div>
+    <div class="actions">
+      <p class="paragraph-sm"> {{currentValue}} de {{goalValue}} {{ type === 'book' ? 'páginas' : 'libros' }} </p>
+      <ion-item>
+        <ion-progress-bar [value]="percentage/100"></ion-progress-bar>
+        <span> {{percentage}}% </span>
+      </ion-item>
+    </div>
+  </div>
+</div>

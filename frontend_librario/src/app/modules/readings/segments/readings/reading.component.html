@@ -1,0 +1,44 @@
+<ion-refresher slot="fixed" [pullFactor]="0.5" [pullMin]="50" [pullMax]="100" (ionRefresh)="getReadings($event)">
+  <ion-refresher-content pullingIcon="refresh-outline"></ion-refresher-content>
+</ion-refresher>
+
+<div class="spaced-column">
+
+  @if (isLoaded === undefined) {
+  <div class="spinner-container">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+  </div>
+  }@else if (isLoaded === false) {
+  <div class="no-result paragraph-lg">Error al cargar la información</div>
+  }@else {
+
+    @for (reading of readingsPreview; track reading.id) {
+    <app-progress
+    [title]="reading.title"
+    [author]="reading.author"
+    [currentValue]="reading.currentPage"
+    [goalValue]="reading.totalPages"
+    [percentage]="reading.percentage"
+    [coverUrl]="reading.cover"
+    type="book"
+    (onClick)="openReadingDetails(reading.id.toString())">
+    </app-progress>
+    }
+
+    @if (readingsPreview.length === 0) {
+    <div class="no-result paragraph-lg">No hay lecturas</div>
+    }
+  }
+
+  <ion-modal 
+  [isOpen]="isModalOpen" 
+  [initialBreakpoint]="0.25" 
+  [breakpoints]="[0, 0.25]"
+  (didDismiss)="onModalDismiss()">
+    <ng-template>
+      <div class="modal-submenu">
+        <app-item title="Nueva lectura" (onClick)="openNewReading()"></app-item>
+      </div>
+    </ng-template>
+  </ion-modal>
+</div>

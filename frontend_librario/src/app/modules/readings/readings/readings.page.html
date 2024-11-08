@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-title class="title-md">Mis lecturas</ion-title>
     <ion-buttons slot="primary">
-      <ion-button>
+      <ion-button (click)="openSubmenu()">
         <ion-icon slot="icon-only" ios="ellipsis-vertical" md="ellipsis-vertical" class="icon-button"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -20,6 +20,5 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
-  <div>{{ contentMap[selectedSegment] }}</div>
-  <!-- <ng-container *ngComponentOutlet="componentMap[selectedSegment]"></ng-container> -->
+  <ng-container *ngComponentOutlet="contentMap[selectedSegment]"></ng-container>
 </ion-content>

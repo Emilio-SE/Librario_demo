@@ -1,0 +1,63 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start" (click)="closeModal()">
+      <ion-icon name="chevron-back" class="paragraph-lg"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="form" class="header">
+    @if (isBookLoaded && bookData) {
+    <app-progress
+    [title]="bookData.title"
+    [author]="bookData.author"
+    [currentValue]="0"
+    [goalValue]="bookData.totalPages"
+    [percentage]="0"
+    [coverUrl]="bookData.cover"
+    type="book">
+    </app-progress>
+
+    <ion-item>
+      <ion-label position="stacked" class="paragraph-lg">Calificación</ion-label>
+      <ion-input formControlName="rate" type="number" [max]="5" [min]="0"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked" class="paragraph-lg">Reseña</ion-label>
+      <ion-textarea formControlName="review"></ion-textarea>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked" class="paragraph-lg">Página actual</ion-label>
+      <ion-input formControlName="currentPage" type="number"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked" class="paragraph-lg">Fecha de inicio</ion-label>
+      <ion-input formControlName="startReadingDate" type="date"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked" class="paragraph-lg">Fecha de terminación</ion-label>
+      <ion-input formControlName="endReadingDate" type="date"></ion-input>
+    </ion-item>
+
+    <ion-row>
+      <ion-col size="6">
+        <ion-button (click)="requestDeleteReading()" color="danger" expand="block">Eliminar</ion-button>
+      </ion-col>
+      <ion-col size="6">
+        <ion-button (click)="updateReading()" [disabled]="form.invalid" color="primary" expand="block">Actualizar</ion-button>
+      </ion-col>
+    </ion-row>
+    }@else if(isBookLoaded === undefined){
+    <div class="spinner-container">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+    </div>
+    }@else {
+    <div class="no-result paragraph-lg">Error al cargar la información</div>
+    }
+  </form>
+</ion-content>
