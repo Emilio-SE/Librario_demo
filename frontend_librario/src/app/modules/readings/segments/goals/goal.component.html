@@ -1,11 +1,56 @@
-<p>
-    <!-- <app-progress
-  title="Meta anual"
-  initDate="01/01/2021"
-  endDate="31/12/2021"
-  [currentValue]="12"
-  [goalValue]="52"
-  [percentage]="23"
-  type="goal">
-  </app-progress> -->
-</p>
+<ion-refresher slot="fixed" [pullFactor]="0.5" [pullMin]="50" [pullMax]="100" (ionRefresh)="getGoals($event)">
+  <ion-refresher-content pullingIcon="refresh-outline"></ion-refresher-content>
+</ion-refresher>
+
+<div class="spaced-column">
+
+  @if (isLoaded === undefined) {
+  <div class="spinner-container">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+  </div>
+  }@else if (isLoaded === false) {
+  <div class="no-result paragraph-lg">Error al cargar la información</div>
+  }@else {
+
+    @for (goal of goalsPreview; track goal.id) {
+    <app-progress
+    [title]="goal.title"
+    [initDate]="goal.initialDate"
+    [endDate]="goal.finalDate"
+    [currentValue]="goal.currentBooksRead"
+    [goalValue]="goal.quantity"
+    [percentage]="goal.percentage"
+    type="goal"
+    (onClick)="openGoalOptions(goal.id.toString())">
+    </app-progress>
+    }
+
+    @if (goalsPreview.length === 0) {
+    <div class="no-result paragraph-lg">No hay metas</div>
+    }
+  }
+
+  <ion-modal 
+  [isOpen]="isNewGoalOpen" 
+  [initialBreakpoint]="0.25" 
+  [breakpoints]="[0, 0.25]"
+  (didDismiss)="onNewGoalDismiss()">
+    <ng-template>
+      <div class="modal-submenu">
+        <app-item title="Nueva meta" (onClick)="openNewGoal()"></app-item>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+  <ion-modal 
+  [isOpen]="isEditGoalOpen" 
+  [initialBreakpoint]="0.25" 
+  [breakpoints]="[0, 0.25]"
+  (didDismiss)="onEditGoalDismiss()">
+    <ng-template>
+      <div class="modal-submenu">
+        <app-item title="Actualizar meta" (onClick)="openEditGoal()"></app-item>
+      </div>
+    </ng-template>
+  </ion-modal>
+</div>

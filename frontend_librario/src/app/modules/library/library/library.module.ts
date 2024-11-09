@@ -36,7 +36,7 @@ import { OtherService } from '../modals/services/other.service';
 import { BooksetsService } from '../modals/services/booksets.service';
 
 //Pipes
-import { FilterBookListPipe } from '../modals/pipes/filter-book-list.pipe';
+import { CommonPipesModule } from 'src/app/core/pipes/common-pipes.module';
 
 const routes: Routes = [
   {
@@ -54,6 +54,7 @@ const routes: Routes = [
     ItemComponent,
     BookPreviewComponent,
     ReactiveFormsModule,
+    CommonPipesModule,
   ],
   declarations: [
     LibraryPage,
@@ -63,7 +64,6 @@ const routes: Routes = [
     TagListPage,
     FillBookPage,
     BookDetailsPage,
-    FilterBookListPipe,
     BookshelfComponent,
     BookshelfDetailsPage,
     ShelfDetailsPage,

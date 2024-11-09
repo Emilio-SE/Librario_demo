@@ -20,9 +20,12 @@ import { ReadingsService } from '../models/services/readings.service';
 import { BookSelectionPage } from '../segments/readings/book-selection/book-selection.page';
 import { FillReadingPage } from '../segments/readings/fill-reading/fill-reading.page';
 import { UpdateReadingPage } from '../segments/readings/update-reading/update-reading.page';
-import { FilterBookListPipe } from '../../library/modals/pipes/filter-book-list.pipe';
+import { CommonPipesModule } from 'src/app/core/pipes/common-pipes.module';
 
 import { BooksService } from '../../library/modals/services/books.service';
+import { GaolService } from '../models/services/gaol.service.service';
+
+import { ManageGoalsPage } from '../segments/goals/manage-goals/manage-goals.page';
 
 const routes: Routes = [
   {
@@ -41,6 +44,7 @@ const routes: Routes = [
     ItemComponent,
     ProgressComponent,
     BookPreviewComponent,
+    CommonPipesModule,
   ],
   declarations: [
     ReadingsPage,
@@ -49,13 +53,14 @@ const routes: Routes = [
     BookSelectionPage,
     FillReadingPage,
     UpdateReadingPage,
-    FilterBookListPipe
+    ManageGoalsPage,
   ],
   exports: [RouterModule],
   providers: [
     ReadingsSubmenuCommunicationService,
     ReadingsService,
     BooksService,
+    GaolService
   ],
 })
 export class ReadingsPageModule {}

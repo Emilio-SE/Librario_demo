@@ -1,0 +1,17 @@
+ion-item {
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    --background: transparent;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    gap: 20px;
+    background-color: var(--color-secondary-400);
+    border: 1px solid var(--color-tertiary-200);
+    border-radius: 5px;
+}

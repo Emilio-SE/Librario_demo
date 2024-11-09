@@ -65,6 +65,7 @@ export class ReadingComponent implements OnInit {
             'danger',
             'Ha ocurrido un error al cargar las lecturas ' + err.error.message
           );
+          if (event) event.target.complete();
           this._cdr.detectChanges();
         },
       });

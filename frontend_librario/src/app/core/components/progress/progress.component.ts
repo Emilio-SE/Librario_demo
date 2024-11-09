@@ -30,6 +30,10 @@ export class ProgressComponent implements OnInit {
 
   ngOnInit() {}
 
+  ngOnChanges() {
+    this.percentage = parseFloat(this.percentage.toFixed(2));
+  }
+
   public onClickSelect(): void {
       this.onClick.emit();
   }
