@@ -12,9 +12,9 @@
     <app-progress
     [title]="bookData.title"
     [author]="bookData.author"
-    [currentValue]="0"
+    [currentValue]="bookData.currentPage"
     [goalValue]="bookData.totalPages"
-    [percentage]="0"
+    [percentage]="bookData.percentage"
     [coverUrl]="bookData.cover"
     type="book">
     </app-progress>
