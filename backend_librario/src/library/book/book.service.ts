@@ -16,6 +16,8 @@ import { ValidateUtils } from 'src/common/utils/validate.utils';
 
 import { MessageResponse } from 'src/common/interfaces/response.interface';
 
+import axios from 'axios';
+
 @Injectable()
 export class BookService {
   private readonly validateUtils = new ValidateUtils();
@@ -49,6 +51,18 @@ export class BookService {
     return await this.dataSource.transaction(
       async (transactionalEntityManager) => {
         const { genre, tag, bookset, ...bookData } = createBookDto;
+
+        bookData.acquisitionDate =
+          bookData.acquisitionDate.toString().length > 0
+            ? (bookData.acquisitionDate = new Date(bookData.acquisitionDate))
+            : null;
+
+        bookData.publicationDate =
+          bookData.publicationDate.toString().length > 0
+            ? (bookData.publicationDate = new Date(bookData.publicationDate))
+            : undefined;
+
+        bookData.asExpense = !!bookData.asExpense;
 
         const newBook = this.bookRepository.create({
           ...bookData,
@@ -84,6 +98,17 @@ export class BookService {
     );
   }
 
+  public async getBookDetailsByISBN(isbn: string): Promise<BookPreviewDto> {
+    try {
+      const response = await axios.get(
+        `https://openlibrary.org/isbn/${isbn}.json`,
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error('Error al obtener datos del libro');
+    }
+  }
+
   // --- Read preview operations ---
 
   async getBookPreview(userId: number): Promise<BookPreviewDto[]> {
@@ -106,21 +131,25 @@ export class BookService {
       throw new NotFoundException('Book not found.');
     }
 
-    return this.formatBookDetails(book);
+    return book;
   }
 
   private async fetchBookDetails(
     bookId: number,
     userId: number,
   ): Promise<BookDetailsDto | undefined> {
-    return await this.bookRepository
+    const rawBook = await this.bookRepository
       .createQueryBuilder('book')
       .leftJoin('book.bookGenres', 'bookgenre')
+      .leftJoin('bookgenre.genre', 'genre')
       .leftJoin('book.bookTags', 'booktag')
+      .leftJoin('booktag.tag', 'tag')
+      .leftJoin('book.format', 'format')
       .leftJoin('book.shelfBooks', 'shelfbook')
       .leftJoin('shelfbook.shelf', 'shelf')
       .leftJoin('shelf.bookshelf', 'bookshelf')
       .leftJoin('book.booksetBooks', 'booksetbook')
+      .leftJoin('booksetbook.bookset', 'bookset')
       .select([
         'book.id AS id',
         'book.title AS title',
@@ -137,43 +166,71 @@ export class BookService {
         'book.price AS price',
         'book.asexpense AS asExpense',
         'book.coverUrl AS coverUrl',
-        'GROUP_CONCAT(DISTINCT bookgenre.genreid) AS genres',
-        'GROUP_CONCAT(DISTINCT booktag.tagid) AS tags',
-        'GROUP_CONCAT(DISTINCT CONCAT_WS(":", bookshelf.id, shelf.id)) AS bookshelf_shelf',
-        'GROUP_CONCAT(DISTINCT booksetbook.booksetid) AS booksets',
+        'GROUP_CONCAT(DISTINCT CONCAT(bookgenre.genreid, ":", genre.name)) AS genres',
+        'GROUP_CONCAT(DISTINCT CONCAT(booktag.tagid, ":", tag.name)) AS tags',
+        'GROUP_CONCAT(DISTINCT CONCAT(bookshelf.id, ":", bookshelf.name, ":", shelf.id, ":", shelf.name)) AS bookshelf_shelf',
+        'GROUP_CONCAT(DISTINCT CONCAT(booksetbook.booksetid, ":", bookset.name)) AS booksets',
+        'GROUP_CONCAT(DISTINCT CONCAT(format.id, ":", format.name)) AS format',
       ])
       .where('book.id = :bookId', { bookId })
       .andWhere('book.userId = :userId', { userId })
       .groupBy('book.id')
       .getRawOne();
+
+    return rawBook ? this.formatBookDetails(rawBook) : undefined;
   }
 
   private formatBookDetails(book: any): BookDetailsDto {
+    const genres = this.parseIdNameString(book.genres);
+    const tags = this.parseIdNameString(book.tags);
+    const booksets = this.parseIdNameString(book.booksets);
+    const bookshelfShelves = this.parseBookshelfShelves(book.bookshelf_shelf);
+    const format = this.parseIdNameString(book.format)[0];
+
     return {
       ...book,
-      genres: this.parseIdsString(book.genres),
-      tags: this.parseIdsString(book.tags),
-      bookshelfShelves: this.parseBookshelfShelves(book.bookshelf_shelf),
-      booksets: this.parseIdsString(book.booksets),
+      genres,
+      tags,
+      bookshelfShelves,
+      booksets,
+      format,
     };
   }
 
-  private parseBookshelfShelves(
-    bookshelfShelf: string,
-  ): Array<{ bookshelfId: number; shelves: number[] }> {
-    if (!bookshelfShelf) return [];
-    return bookshelfShelf.split(',').reduce((acc, item) => {
-      const [bookshelfId, shelfId] = item.split(':').map(Number);
-      const bookshelf = acc.find((b) => b.bookshelfId === bookshelfId);
-      bookshelf
-        ? bookshelf.shelves.push(shelfId)
-        : acc.push({ bookshelfId, shelves: [shelfId] });
-      return acc;
-    }, []);
+  private parseIdNameString(
+    idNameString: string | null,
+  ): Array<{ id: number; name: string }> {
+    if (!idNameString || typeof idNameString !== 'string') return [];
+    const uniqueEntries = new Set(
+      idNameString.split(',').map((item) => {
+        const [id, name] = item.split(':');
+        return JSON.stringify({ id: Number(id), name });
+      }),
+    );
+
+    return Array.from(uniqueEntries).map((entry) => JSON.parse(entry));
   }
 
-  private parseIdsString(idsString: string | null): number[] {
-    return idsString ? idsString.split(',').map(Number) : [];
+  private parseBookshelfShelves(bookshelfShelf: string | null): Array<{
+    bookshelf: { id: number; name: string };
+    shelves: { id: number; name: string }[];
+  }> {
+    if (!bookshelfShelf) return [];
+    return bookshelfShelf.split(',').reduce((acc, item) => {
+      const [bookshelfId, bookshelfName, shelfId, shelfName] = item.split(':');
+      const bookshelf = acc.find((b) => b.bookshelf.id === Number(bookshelfId));
+
+      const shelf = { id: Number(shelfId), name: shelfName };
+      if (bookshelf) {
+        bookshelf.shelves.push(shelf);
+      } else {
+        acc.push({
+          bookshelf: { id: Number(bookshelfId), name: bookshelfName },
+          shelves: [shelf],
+        });
+      }
+      return acc;
+    }, []);
   }
 
   // --- Update operation ---
@@ -196,6 +253,18 @@ export class BookService {
     book: Book,
     updateData: UpdateBookDto,
   ): Promise<void> {
+    updateData.acquisitionDate =
+      updateData.acquisitionDate.toString().length > 0
+        ? (updateData.acquisitionDate = new Date(updateData.acquisitionDate))
+        : null;
+
+    updateData.publicationDate =
+      updateData.publicationDate.toString().length > 0
+        ? (updateData.publicationDate = new Date(updateData.publicationDate))
+        : undefined;
+
+    updateData.asExpense = !!updateData.asExpense;
+
     Object.assign(book, updateData);
     await this.bookRepository.save(book);
   }
@@ -254,7 +323,7 @@ export class BookService {
         return {
           message: 'Book deleted successfully',
           statusCode: 200,
-        }
+        };
       }
     });
   }

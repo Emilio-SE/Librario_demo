@@ -122,7 +122,7 @@ export class ShelfService {
       .createQueryBuilder(Book, 'book')
       .leftJoin('shelfbook', 'sb', 'sb.bookId = book.id')
       .where('sb.shelfId = :shelfId', { shelfId: shelf.id })
-      .select(['book.id', 'book.title', 'book.author'])
+      .select(['book.id', 'book.title', 'book.author', 'book.coverUrl'])
       .getRawMany();
 
     return {
@@ -130,8 +130,9 @@ export class ShelfService {
       name: shelf.name,
       books: books.map((book) => ({
         id: book.book_id,
-        name: book.book_title,
+        title: book.book_title,
         author: book.book_author,
+        cover: book.book_coverUrl
       })),
     };
   }

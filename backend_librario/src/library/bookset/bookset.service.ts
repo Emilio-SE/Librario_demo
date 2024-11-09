@@ -103,6 +103,7 @@ export class BooksetService {
         'book.id AS bookId',
         'book.title AS bookTitle',
         'book.author AS bookAuthor',
+        'book.coverUrl AS coverUrl',
       ])
       .where('bookset.id = :booksetId', { booksetId })
       .andWhere('bookset.userId = :userId', { userId })
@@ -116,6 +117,7 @@ export class BooksetService {
         id: item.bookId,
         title: item.bookTitle,
         author: item.bookAuthor,
+        cover: item.coverUrl,
       }));
 
     return {

@@ -5,5 +5,6 @@ export class BooksetPreviewDto {
     id: number;
     title: string;
     author: string;
+    cover: string;
   }[];
 }

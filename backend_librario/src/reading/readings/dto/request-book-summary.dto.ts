@@ -3,4 +3,5 @@ export class RequestBookSummaryDto {
   title: string;
   author: string;
   totalPages: number;
+  cover: string;
 }

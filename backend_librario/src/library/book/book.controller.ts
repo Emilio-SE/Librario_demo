@@ -32,6 +32,12 @@ export class BookController {
     return await this.bookService.createBook(createBookDto, userId);
   }
 
+  @Get('isbn/:isbn')
+  async getBookDetailsByISBN(@Req() req: Request): Promise<BookPreviewDto> {
+    const isbn = req.params['isbn'];
+    return this.bookService.getBookDetailsByISBN(isbn);
+  }
+
   @Get()
   async getBookPreview(@Req() req: Request): Promise<BookPreviewDto[]> {
     return this.bookService.getBookPreview(req.user['id']);

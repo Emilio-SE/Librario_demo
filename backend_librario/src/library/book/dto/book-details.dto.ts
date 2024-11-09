@@ -14,13 +14,18 @@ export class BookDetailsDto {
   price?: number;
   asExpense?: boolean;
   coverUrl?: string;
-  genres: number[];
-  tags: number[];
-  booksets: number[];
+  genres: ItemDetails[];
+  tags: ItemDetails[];
+  booksets: ItemDetails[];
   bookshelfShelves: Shelves[];
 }
 
 export interface Shelves {
-  bookshelfId: number;
-  shelves: number[];
+  bookshelf: ItemDetails;
+  shelves: ItemDetails[];
+}
+
+export interface ItemDetails {
+  id: number;
+  name: string;
 }

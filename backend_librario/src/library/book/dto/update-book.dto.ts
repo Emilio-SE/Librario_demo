@@ -34,11 +34,9 @@ export class UpdateBookDto {
   pages?: number;
 
   @IsOptional()
-  @IsDateString()
   publicationDate?: Date;
 
   @IsOptional()
-  @IsDateString()
   acquisitionDate?: Date;
 
   @IsOptional()

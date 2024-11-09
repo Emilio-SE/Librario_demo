@@ -75,6 +75,7 @@ export class ReadingsService {
         'book.author AS author',
         'reading.currentPage AS currentPage',
         'book.pages AS totalPages',
+        'book.coverUrl AS cover',
         'ROUND((reading.currentPage / book.pages) * 100, 2) AS percentage',
       ])
       .where('reading.userId = :userId', { userId })
@@ -84,6 +85,7 @@ export class ReadingsService {
       id: reading.id,
       title: reading.title,
       author: reading.author,
+      cover: reading.cover,
       currentPage: reading.currentPage,
       totalPages: reading.totalPages,
       percentage: Number(reading.percentage),
@@ -98,7 +100,7 @@ export class ReadingsService {
       this.bookRepository,
       {
         where: { id: bookId, user: { id: userId } },
-        select: ['id', 'title', 'author', 'pages'],
+        select: ['id', 'title', 'author', 'pages', 'coverUrl'],
       },
       'Book',
     );
@@ -108,6 +110,7 @@ export class ReadingsService {
       title: book.title,
       author: book.author,
       totalPages: book.pages,
+      cover: book.coverUrl,
     };
   }
 
@@ -119,6 +122,7 @@ export class ReadingsService {
         'reading.id AS id',
         'book.title AS title',
         'book.author AS author',
+        'book.coverUrl AS cover',
         'reading.currentPage AS currentPage',
         'book.pages AS totalPages',
         'ROUND((reading.currentPage / book.pages) * 100, 2) AS percentage',
@@ -139,6 +143,7 @@ export class ReadingsService {
       id: reading.id,
       title: reading.title,
       author: reading.author,
+      cover: reading.cover,
       currentPage: reading.currentPage,
       totalPages: reading.totalPages,
       percentage: Number(reading.percentage),
@@ -176,8 +181,13 @@ export class ReadingsService {
     if (
       updateReadingDto.currentPage &&
       reading.currentPage === reading.book.pages
+      && !reading.endReadingDate
     ) {
-      reading.endReadingDate = new Date();
+      reading.endReadingDate = new Date(
+        reading.endReadingDate.getUTCMonth(),
+        reading.endReadingDate.getUTCDate(),
+        reading.endReadingDate.getUTCFullYear(),
+      );
     }
 
     return await this.entityManager.save(reading);

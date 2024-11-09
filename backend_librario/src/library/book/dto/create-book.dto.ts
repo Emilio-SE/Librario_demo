@@ -40,11 +40,9 @@ export class CreateBookDto {
   pages?: number;
 
   @IsOptional()
-  @IsDateString()
   publicationDate?: Date;
 
   @IsOptional()
-  @IsDateString()
   acquisitionDate?: Date;
 
   @IsOptional()
