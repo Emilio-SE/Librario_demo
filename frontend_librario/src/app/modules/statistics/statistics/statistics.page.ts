@@ -11,6 +11,11 @@ import { FinanceStatisticsComponent } from '../segments/finance-statistics/finan
 export class StatisticsPage implements OnInit {
   selectedSegment = 'books' as 'books' | 'expenses';
 
+  public contentMap = {
+    books: BooksStatisticsComponent,
+    expenses: FinanceStatisticsComponent,
+  }
+
   constructor() {}
 
   ngOnInit() {}
